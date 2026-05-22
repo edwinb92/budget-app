@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Budget",
+    "slug": "budget-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "budget",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#FAF7F2"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.budget.app"
+    },
+    "android": {
+      "package": "com.budget.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FAF7F2"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
