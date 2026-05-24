@@ -10,7 +10,7 @@ interface MemberRowProps {
   role: MembershipRole;
   isCurrentUser: boolean;
   canManage: boolean;
-  onRemove?: () => void;
+  onMore?: () => void;
 }
 
 export const MemberRow: React.FC<MemberRowProps> = ({
@@ -18,7 +18,7 @@ export const MemberRow: React.FC<MemberRowProps> = ({
   role,
   isCurrentUser,
   canManage,
-  onRemove,
+  onMore,
 }) => {
   const accent = colors.accents[user.accent];
   const isOwner = role === 'owner';
@@ -49,7 +49,7 @@ export const MemberRow: React.FC<MemberRowProps> = ({
 
       {canManage && !isCurrentUser && !isOwner ? (
         <Pressable
-          onPress={onRemove}
+          onPress={onMore}
           hitSlop={8}
           style={({ pressed }) => [styles.moreBtn, pressed && styles.pressed]}
         >

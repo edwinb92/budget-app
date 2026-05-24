@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -14,13 +15,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LogOut, Plus, Trash2, X } from 'lucide-react-native';
 
 import { CurrencyPicker } from '@/components/household/CurrencyPicker';
+import { EditMemberModal } from '@/components/household/EditMemberModal';
+import { MemberActionsSheet } from '@/components/household/MemberActionsSheet';
 import { MemberRow } from '@/components/household/MemberRow';
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
 import {
   useHouseholdStore,
 } from '@/store/householdStore';
 import { colors, radius, spacing, typography } from '@/theme';
-import type { CurrencyCode, Membership } from '@/types';
+import type { CurrencyCode, Membership, User } from '@/types';
 
 export const ManageHouseholdModal: React.FC = () => {
   const householdId = useHouseholdEditorStore((s) => s.manageOpenForId);
@@ -38,6 +41,10 @@ export const ManageHouseholdModal: React.FC = () => {
     (s) => s.removeUserFromHousehold,
   );
   const deleteHousehold = useHouseholdStore((s) => s.deleteHousehold);
+  const updateUser = useHouseholdStore((s) => s.updateUser);
+
+  const [actionsMember, setActionsMember] = useState<User | null>(null);
+  const [editingMember, setEditingMember] = useState<User | null>(null);
 
   const members =
     householdId && memberships && users
@@ -82,6 +89,38 @@ export const ManageHouseholdModal: React.FC = () => {
   const handleDelete = () => {
     deleteHousehold(householdId);
     close();
+  };
+
+  const confirmRemoveMember = (member: User) => {
+    Alert.alert(
+      'Remove member',
+      `Remove ${member.name} from ${household.name}? They won't have access to this budget anymore.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => removeUserFromHousehold(householdId, member.id),
+        },
+      ],
+    );
+  };
+
+  const handleEditMember = () => {
+    setEditingMember(actionsMember);
+    setActionsMember(null);
+  };
+
+  const handleRemoveMember = () => {
+    const target = actionsMember;
+    setActionsMember(null);
+    if (target) confirmRemoveMember(target);
+  };
+
+  const handleSaveMemberName = (name: string) => {
+    if (!editingMember) return;
+    updateUser(editingMember.id, { name });
+    setEditingMember(null);
   };
 
   return (
@@ -144,9 +183,7 @@ export const ManageHouseholdModal: React.FC = () => {
                   role={role}
                   isCurrentUser={user.id === currentUserId}
                   canManage={isOwner}
-                  onRemove={() =>
-                    removeUserFromHousehold(householdId, user.id)
-                  }
+                  onMore={() => setActionsMember(user)}
                 />
               ))}
             </View>
@@ -229,6 +266,19 @@ export const ManageHouseholdModal: React.FC = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      <MemberActionsSheet
+        member={actionsMember}
+        onClose={() => setActionsMember(null)}
+        onEdit={handleEditMember}
+        onRemove={handleRemoveMember}
+      />
+
+      <EditMemberModal
+        member={editingMember}
+        onClose={() => setEditingMember(null)}
+        onSave={handleSaveMemberName}
+      />
     </Modal>
   );
 };

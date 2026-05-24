@@ -25,10 +25,10 @@ export const CategoriesScreen: React.FC = () => {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <View style={styles.titleBlock}>
-            <Text style={styles.title}>Categories</Text>
+            <Text style={styles.eyebrow}>
+              Categories ({categories.length})
+            </Text>
             <Text style={styles.subtitle}>
-              {categories.length} {categories.length === 1 ? 'category' : 'categories'}
-              {' · '}
               {formatCurrency(totalSpent)} of {formatCurrency(totalBudget)}
             </Text>
           </View>
@@ -57,8 +57,7 @@ export const CategoriesScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: spacing.sm,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   titleRow: {
     flexDirection: 'row',
@@ -68,13 +67,13 @@ const styles = StyleSheet.create({
   titleBlock: {
     flex: 1,
   },
-  title: {
-    ...typography.title,
-    color: colors.text.primary,
+  eyebrow: {
+    ...typography.overline,
+    color: colors.text.muted,
   },
   subtitle: {
     ...typography.caption,
-    color: colors.text.muted,
+    color: colors.text.faint,
     marginTop: 2,
   },
   newBtn: {

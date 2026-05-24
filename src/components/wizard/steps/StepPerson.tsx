@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 
 import { OptionTile } from '@/components/wizard/OptionTile';
 import {
@@ -12,7 +13,7 @@ import { colors, spacing, typography } from '@/theme';
 export const StepPerson: React.FC = () => {
   const selected = useWizardStore((s) => s.draft.paidById);
   const setPaidById = useWizardStore((s) => s.setPaidById);
-  const members = useHouseholdStore(selectActiveHouseholdMembers);
+  const members = useHouseholdStore(useShallow(selectActiveHouseholdMembers));
 
   return (
     <View style={styles.wrap}>

@@ -27,6 +27,7 @@ interface HouseholdState {
   removeUserFromHousehold: (householdId: string, userId: string) => void;
   deleteHousehold: (id: string) => void;
   addMembership: (input: { householdId: string; userId: string; role: Membership['role'] }) => void;
+  updateUser: (userId: string, patch: Partial<Pick<User, 'name' | 'email'>>) => void;
 }
 
 const makeId = (prefix: string): string =>
@@ -104,6 +105,19 @@ export const useHouseholdStore = create<HouseholdState>((set) => ({
         ...s.memberships,
         { householdId, userId, role, joinedAt: Date.now() },
       ],
+    })),
+
+  updateUser: (userId, patch) =>
+    set((s) => ({
+      users: s.users.map((u) => {
+        if (u.id !== userId) return u;
+        const nextName = patch.name?.trim();
+        return {
+          ...u,
+          ...(nextName ? { name: nextName, initial: nextName.charAt(0).toUpperCase() } : {}),
+          ...(patch.email !== undefined ? { email: patch.email.trim() } : {}),
+        };
+      }),
     })),
 }));
 

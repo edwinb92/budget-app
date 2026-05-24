@@ -5,7 +5,6 @@ import { ChevronDown, Users } from 'lucide-react-native';
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
 import {
   selectActiveHousehold,
-  selectActiveHouseholdMembers,
   useHouseholdStore,
 } from '@/store/householdStore';
 import { colors, radius, shadows, spacing, typography } from '@/theme';
@@ -32,7 +31,7 @@ export const HouseholdSelector: React.FC = () => {
       ]}
     >
       <View style={styles.iconWrap}>
-        <Users size={18} color={colors.primary} strokeWidth={2.4} />
+        <Users size={20} color={colors.onPrimary} strokeWidth={2.4} />
       </View>
 
       <View style={styles.text}>
@@ -40,13 +39,17 @@ export const HouseholdSelector: React.FC = () => {
         <Text style={styles.name} numberOfLines={1}>
           {household.name}
         </Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaText}>
+            {memberCount} {memberCount === 1 ? 'member' : 'members'}
+          </Text>
+          <View style={styles.metaDot} />
+          <Text style={styles.metaText}>{household.currency}</Text>
+        </View>
       </View>
 
-      <View style={styles.right}>
-        <Text style={styles.memberCount}>
-          {memberCount} {memberCount === 1 ? 'member' : 'members'}
-        </Text>
-        <ChevronDown size={18} color={colors.text.muted} strokeWidth={2.4} />
+      <View style={styles.chevronWrap}>
+        <ChevronDown size={18} color={colors.primary} strokeWidth={2.6} />
       </View>
     </Pressable>
   );
@@ -56,21 +59,23 @@ const styles = StyleSheet.create({
   btn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primarySoft,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
     gap: spacing.md,
     marginBottom: spacing.lg,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
   },
   pressed: {
     opacity: 0.92,
     transform: [{ scale: 0.995 }],
   },
   iconWrap: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.md,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -79,21 +84,36 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     ...typography.overline,
-    color: colors.text.muted,
+    color: colors.primary,
     marginBottom: 2,
   },
   name: {
-    ...typography.subtitle,
+    ...typography.title,
     color: colors.text.primary,
   },
-  right: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    marginTop: 4,
   },
-  memberCount: {
+  metaText: {
     ...typography.caption,
-    color: colors.text.faint,
+    color: colors.text.muted,
     fontWeight: '600',
+  },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: colors.text.faint,
+  },
+  chevronWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
