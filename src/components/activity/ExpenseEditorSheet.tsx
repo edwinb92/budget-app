@@ -74,18 +74,18 @@ export const ExpenseEditorSheet: React.FC = () => {
   };
 
   const handleDelete = () => {
+    const targetId = expense.id;
+    const targetName = category.name.toLowerCase();
+    close();
     Alert.alert(
       'Delete expense',
-      `Remove this ${category.name.toLowerCase()} expense? This will update your category and monthly totals.`,
+      `Remove this ${targetName} expense? This will update your category and monthly totals.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            deleteExpense(expense.id);
-            close();
-          },
+          onPress: () => deleteExpense(targetId),
         },
       ],
     );

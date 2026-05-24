@@ -16,6 +16,7 @@ import { LogOut, Plus, Trash2, X } from 'lucide-react-native';
 
 import { CurrencyPicker } from '@/components/household/CurrencyPicker';
 import { EditMemberModal } from '@/components/household/EditMemberModal';
+import { InviteMemberSheet } from '@/components/household/InviteMemberSheet';
 import { MemberActionsSheet } from '@/components/household/MemberActionsSheet';
 import { MemberRow } from '@/components/household/MemberRow';
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
@@ -45,6 +46,7 @@ export const ManageHouseholdModal: React.FC = () => {
 
   const [actionsMember, setActionsMember] = useState<User | null>(null);
   const [editingMember, setEditingMember] = useState<User | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const members =
     householdId && memberships && users
@@ -167,9 +169,7 @@ export const ManageHouseholdModal: React.FC = () => {
                     styles.inviteBtn,
                     pressed && styles.pressed,
                   ]}
-                  onPress={() => {
-                    // Invite flow lands with Supabase backend
-                  }}
+                  onPress={() => setInviteOpen(true)}
                 >
                   <Plus size={14} color={colors.primary} strokeWidth={2.6} />
                   <Text style={styles.inviteLabel}>Invite</Text>
@@ -278,6 +278,12 @@ export const ManageHouseholdModal: React.FC = () => {
         member={editingMember}
         onClose={() => setEditingMember(null)}
         onSave={handleSaveMemberName}
+      />
+
+      <InviteMemberSheet
+        visible={inviteOpen}
+        householdName={household.name}
+        onClose={() => setInviteOpen(false)}
       />
     </Modal>
   );

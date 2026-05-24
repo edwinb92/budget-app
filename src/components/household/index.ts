@@ -4,3 +4,4 @@ export { CreateHouseholdModal } from './CreateHouseholdModal';
 export { ManageHouseholdModal } from './ManageHouseholdModal';
 export { MemberActionsSheet } from './MemberActionsSheet';
 export { EditMemberModal } from './EditMemberModal';
+export { InviteMemberSheet } from './InviteMemberSheet';
