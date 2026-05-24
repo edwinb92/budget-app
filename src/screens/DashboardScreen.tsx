@@ -9,13 +9,23 @@ import {
 } from '@/components/dashboard';
 import { HouseholdSelector } from '@/components/household';
 import { ScreenContainer, SectionTitle } from '@/components/ui';
+import { useActivityFilterStore } from '@/store/activityFilterStore';
 import { useBudgetStore } from '@/store/budgetStore';
+import { useNavStore } from '@/store/navStore';
 import { colors, radius, spacing, typography } from '@/theme';
+import type { BudgetCategory } from '@/types';
 
 export const DashboardScreen: React.FC = () => {
   const summary = useBudgetStore((s) => s.summary);
   const categories = useBudgetStore((s) => s.categories);
   const bills = useBudgetStore((s) => s.bills);
+  const setActiveTab = useNavStore((s) => s.setActiveTab);
+  const setCategoryFilter = useActivityFilterStore((s) => s.setCategoryFilter);
+
+  const handleCategoryPress = (category: BudgetCategory) => {
+    setCategoryFilter(category.id);
+    setActiveTab('activity');
+  };
 
   return (
     <ScreenContainer>
@@ -44,7 +54,7 @@ export const DashboardScreen: React.FC = () => {
                   index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight,
                 ]}
               >
-                <CategoryCard category={category} />
+                <CategoryCard category={category} onPress={handleCategoryPress} />
               </View>
             ))}
           </View>
