@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type TabId = 'dashboard' | 'activity' | 'categories';
+export type TabId = 'dashboard' | 'activity' | 'categories' | 'settings';
 
 interface NavState {
   activeTab: TabId;

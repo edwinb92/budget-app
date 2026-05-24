@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LayoutDashboard, ListChecks, Tags } from 'lucide-react-native';
+import { LayoutDashboard, ListChecks, Settings, Tags } from 'lucide-react-native';
 
 import { TabButton } from '@/components/navigation/TabButton';
 import { TabId, useNavStore } from '@/store/navStore';
@@ -11,6 +11,7 @@ const TABS: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'activity', label: 'Activity', icon: ListChecks },
   { id: 'categories', label: 'Categories', icon: Tags },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export const TabBar: React.FC = () => {

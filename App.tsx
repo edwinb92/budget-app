@@ -5,12 +5,18 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CategoryEditor } from '@/components/categories';
+import {
+  CreateHouseholdModal,
+  HouseholdPickerSheet,
+  ManageHouseholdModal,
+} from '@/components/household';
 import { QuickAddButton } from '@/components/dashboard';
 import { TabBar } from '@/components/navigation/TabBar';
 import { ExpenseWizard } from '@/components/wizard';
 import { ActivityFeedScreen } from '@/screens/ActivityFeedScreen';
 import { CategoriesScreen } from '@/screens/CategoriesScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
+import { SettingsScreen } from '@/screens/SettingsScreen';
 import { useNavStore } from '@/store/navStore';
 import { useWizardStore } from '@/store/wizardStore';
 import { colors, spacing } from '@/theme';
@@ -26,6 +32,8 @@ const ActiveScreen: React.FC = () => {
       return <ActivityFeedScreen />;
     case 'categories':
       return <CategoriesScreen />;
+    case 'settings':
+      return <SettingsScreen />;
     default:
       return <DashboardScreen />;
   }
@@ -54,6 +62,9 @@ const Shell: React.FC = () => {
       <TabBar />
       <ExpenseWizard />
       <CategoryEditor />
+      <HouseholdPickerSheet />
+      <CreateHouseholdModal />
+      <ManageHouseholdModal />
     </View>
   );
 };

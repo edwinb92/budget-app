@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Plus } from 'lucide-react-native';
 
 import { CategoryListItem } from '@/components/categories';
+import { HouseholdSelector } from '@/components/household';
 import { ScreenContainer } from '@/components/ui';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useCategoryEditorStore } from '@/store/categoryEditorStore';
@@ -19,6 +20,8 @@ export const CategoriesScreen: React.FC = () => {
 
   return (
     <ScreenContainer>
+      <HouseholdSelector />
+
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <View style={styles.titleBlock}>

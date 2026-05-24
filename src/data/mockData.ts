@@ -9,8 +9,10 @@ import type {
   Bill,
   BudgetCategory,
   Expense,
-  HouseholdMember,
+  Household,
+  Membership,
   MonthlySummary,
+  User,
 } from '@/types';
 
 export const mockSummary: MonthlySummary = {
@@ -70,9 +72,80 @@ export const mockCategories: BudgetCategory[] = [
   },
 ];
 
-export const mockMembers: HouseholdMember[] = [
-  { id: 'm-edan', name: 'Edan', initial: 'E', accent: 'violet' },
-  { id: 'm-partner', name: 'Partner', initial: 'P', accent: 'rose' },
+export const mockUsers: User[] = [
+  {
+    id: 'u-edan',
+    name: 'Edan',
+    email: 'edan_baga@yahoo.es',
+    initial: 'E',
+    accent: 'violet',
+  },
+  {
+    id: 'u-partner',
+    name: 'Partner',
+    email: 'partner@example.com',
+    initial: 'P',
+    accent: 'rose',
+  },
+  {
+    id: 'u-mom',
+    name: 'Mom',
+    email: 'mom@example.com',
+    initial: 'M',
+    accent: 'mint',
+  },
+];
+
+export const mockCurrentUserId = 'u-edan';
+
+export const mockHouseholds: Household[] = [
+  {
+    id: 'h-main',
+    name: 'Main Home',
+    createdBy: 'u-edan',
+    createdAt: Date.now() - 90 * 24 * 60 * 60 * 1000,
+    currency: 'USD',
+  },
+  {
+    id: 'h-japan',
+    name: 'Japan Trip',
+    createdBy: 'u-edan',
+    createdAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
+    currency: 'USD',
+  },
+];
+
+export const mockMemberships: Membership[] = [
+  {
+    householdId: 'h-main',
+    userId: 'u-edan',
+    role: 'owner',
+    joinedAt: Date.now() - 90 * 24 * 60 * 60 * 1000,
+  },
+  {
+    householdId: 'h-main',
+    userId: 'u-partner',
+    role: 'member',
+    joinedAt: Date.now() - 80 * 24 * 60 * 60 * 1000,
+  },
+  {
+    householdId: 'h-japan',
+    userId: 'u-edan',
+    role: 'owner',
+    joinedAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
+  },
+  {
+    householdId: 'h-japan',
+    userId: 'u-partner',
+    role: 'member',
+    joinedAt: Date.now() - 12 * 24 * 60 * 60 * 1000,
+  },
+  {
+    householdId: 'h-japan',
+    userId: 'u-mom',
+    role: 'member',
+    joinedAt: Date.now() - 10 * 24 * 60 * 60 * 1000,
+  },
 ];
 
 export const mockBills: Bill[] = [
@@ -124,7 +197,7 @@ export const mockExpenses: Expense[] = [
     categoryId: 'food',
     amount: 32,
     note: 'Lunch with team',
-    paidById: 'm-edan',
+    paidById: 'u-edan',
     createdAt: now - 3 * HOUR,
   },
   {
@@ -132,7 +205,7 @@ export const mockExpenses: Expense[] = [
     categoryId: 'transport',
     amount: 14,
     note: '',
-    paidById: 'm-partner',
+    paidById: 'u-partner',
     createdAt: now - 6 * HOUR,
   },
   {
@@ -140,7 +213,7 @@ export const mockExpenses: Expense[] = [
     categoryId: 'fun',
     amount: 48,
     note: 'Movie tickets',
-    paidById: 'm-edan',
+    paidById: 'u-edan',
     createdAt: now - 1 * DAY - 2 * HOUR,
   },
   {
@@ -148,7 +221,7 @@ export const mockExpenses: Expense[] = [
     categoryId: 'food',
     amount: 76,
     note: 'Groceries',
-    paidById: 'm-partner',
+    paidById: 'u-partner',
     createdAt: now - 1 * DAY - 5 * HOUR,
   },
   {
@@ -156,7 +229,7 @@ export const mockExpenses: Expense[] = [
     categoryId: 'home',
     amount: 120,
     note: 'New lamp',
-    paidById: 'm-edan',
+    paidById: 'u-edan',
     createdAt: now - 3 * DAY,
   },
   {
@@ -164,7 +237,7 @@ export const mockExpenses: Expense[] = [
     categoryId: 'health',
     amount: 22,
     note: '',
-    paidById: 'm-partner',
+    paidById: 'u-partner',
     createdAt: now - 5 * DAY,
   },
 ];

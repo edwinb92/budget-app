@@ -2,13 +2,17 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { OptionTile } from '@/components/wizard/OptionTile';
-import { mockMembers } from '@/data/mockData';
+import {
+  selectActiveHouseholdMembers,
+  useHouseholdStore,
+} from '@/store/householdStore';
 import { useWizardStore } from '@/store/wizardStore';
 import { colors, spacing, typography } from '@/theme';
 
 export const StepPerson: React.FC = () => {
   const selected = useWizardStore((s) => s.draft.paidById);
   const setPaidById = useWizardStore((s) => s.setPaidById);
+  const members = useHouseholdStore(selectActiveHouseholdMembers);
 
   return (
     <View style={styles.wrap}>
@@ -16,14 +20,8 @@ export const StepPerson: React.FC = () => {
       <Text style={styles.subtitle}>So we can split fairly later.</Text>
 
       <View style={styles.row}>
-        {mockMembers.map((member, index) => (
-          <View
-            key={member.id}
-            style={[
-              styles.cell,
-              index === 0 ? styles.cellLeft : styles.cellRight,
-            ]}
-          >
+        {members.map((member) => (
+          <View key={member.id} style={styles.cell}>
             <OptionTile
               label={member.name}
               accent={member.accent}
@@ -37,8 +35,6 @@ export const StepPerson: React.FC = () => {
     </View>
   );
 };
-
-const GUTTER = spacing.md;
 
 const styles = StyleSheet.create({
   wrap: {
@@ -56,12 +52,9 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    marginHorizontal: -GUTTER / 2,
+    gap: spacing.md,
   },
   cell: {
     flex: 1,
-    paddingHorizontal: GUTTER / 2,
   },
-  cellLeft: {},
-  cellRight: {},
 });

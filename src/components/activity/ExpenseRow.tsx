@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { getCategoryIcon } from '@/data/icons';
-import { mockMembers } from '@/data/mockData';
 import { useBudgetStore } from '@/store/budgetStore';
+import { useHouseholdStore } from '@/store/householdStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Expense } from '@/types';
 import { formatCurrency } from '@/utils/format';
@@ -16,7 +16,9 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
   const category = useBudgetStore((s) =>
     s.categories.find((c) => c.id === expense.categoryId),
   );
-  const payer = mockMembers.find((m) => m.id === expense.paidById);
+  const payer = useHouseholdStore((s) =>
+    s.users.find((u) => u.id === expense.paidById),
+  );
 
   if (!category) return null;
 

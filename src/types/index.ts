@@ -30,11 +30,31 @@ export interface MonthlySummary {
   spent: number;
 }
 
-export interface HouseholdMember {
+export interface User {
   id: string;
   name: string;
+  email: string;
   initial: string;
   accent: AccentName;
+}
+
+export type CurrencyCode = 'USD' | 'EUR' | 'COP' | 'ARS' | 'MXN' | 'GBP';
+
+export interface Household {
+  id: string;
+  name: string;
+  createdBy: string;
+  createdAt: number;
+  currency: CurrencyCode;
+}
+
+export type MembershipRole = 'owner' | 'member';
+
+export interface Membership {
+  householdId: string;
+  userId: string;
+  role: MembershipRole;
+  joinedAt: number;
 }
 
 export interface Expense {
