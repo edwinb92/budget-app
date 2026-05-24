@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ActivityEmptyState, DayGroup } from '@/components/activity';
+import { HouseholdSelector } from '@/components/household';
 import { ScreenContainer } from '@/components/ui';
 import { useBudgetStore } from '@/store/budgetStore';
 import { colors, spacing, typography } from '@/theme';
@@ -19,14 +20,16 @@ export const ActivityFeedScreen: React.FC = () => {
 
   return (
     <ScreenContainer>
+      <HouseholdSelector />
+
       <View style={styles.header}>
-        <Text style={styles.title}>Activity</Text>
+        <Text style={styles.eyebrow}>
+          Activity ({expenses.length})
+        </Text>
         <Text style={styles.subtitle}>
           {expenses.length === 0
             ? 'Nothing here yet.'
-            : `${expenses.length} ${
-                expenses.length === 1 ? 'expense' : 'expenses'
-              } · ${formatCurrency(totalThisMonth)}`}
+            : formatCurrency(totalThisMonth)}
         </Text>
       </View>
 
@@ -47,16 +50,15 @@ export const ActivityFeedScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: spacing.sm,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
-  title: {
-    ...typography.title,
-    color: colors.text.primary,
+  eyebrow: {
+    ...typography.overline,
+    color: colors.text.muted,
   },
   subtitle: {
     ...typography.caption,
-    color: colors.text.muted,
+    color: colors.text.faint,
     marginTop: 2,
   },
 });

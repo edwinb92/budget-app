@@ -39,10 +39,15 @@ const ActiveScreen: React.FC = () => {
   }
 };
 
+const FAB_TABS = new Set(['dashboard', 'activity']);
+
 const FloatingFab: React.FC = () => {
   const insets = useSafeAreaInsets();
   const openWizard = useWizardStore((s) => s.open);
+  const activeTab = useNavStore((s) => s.activeTab);
   const bottomOffset = TAB_BAR_HEIGHT + Math.max(insets.bottom, spacing.sm) + spacing.md;
+
+  if (!FAB_TABS.has(activeTab)) return null;
 
   return (
     <View

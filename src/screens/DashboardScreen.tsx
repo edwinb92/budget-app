@@ -7,6 +7,7 @@ import {
   CategoryCard,
   MonthlySummary,
 } from '@/components/dashboard';
+import { HouseholdSelector } from '@/components/household';
 import { ScreenContainer, SectionTitle } from '@/components/ui';
 import { useBudgetStore } from '@/store/budgetStore';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -27,6 +28,8 @@ export const DashboardScreen: React.FC = () => {
             <Bell size={20} color={colors.text.primary} strokeWidth={2.2} />
           </View>
         </View>
+
+        <HouseholdSelector />
 
         <MonthlySummary summary={summary} />
 
