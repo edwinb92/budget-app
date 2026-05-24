@@ -1,8 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
 
 import { getCategoryIcon } from '@/data/icons';
 import { useBudgetStore } from '@/store/budgetStore';
+import { useExpenseEditorStore } from '@/store/expenseEditorStore';
 import { useHouseholdStore } from '@/store/householdStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Expense } from '@/types';
@@ -19,6 +21,7 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
   const payer = useHouseholdStore((s) =>
     s.users.find((u) => u.id === expense.paidById),
   );
+  const openEditor = useExpenseEditorStore((s) => s.open);
 
   if (!category) return null;
 
@@ -27,7 +30,10 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
   const payerAccent = payer ? colors.accents[payer.accent] : null;
 
   return (
-    <View style={styles.row}>
+    <Pressable
+      onPress={() => openEditor(expense.id)}
+      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+    >
       <View style={[styles.iconWrap, { backgroundColor: accent.soft }]}>
         <Icon size={20} color={accent.base} strokeWidth={2.2} />
       </View>
@@ -58,7 +64,9 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
           </View>
         ) : null}
       </View>
-    </View>
+
+      <ChevronRight size={18} color={colors.text.faint} strokeWidth={2.4} />
+    </Pressable>
   );
 };
 
@@ -71,6 +79,10 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.md,
     marginBottom: spacing.sm,
+  },
+  pressed: {
+    opacity: 0.92,
+    transform: [{ scale: 0.995 }],
   },
   iconWrap: {
     width: 44,

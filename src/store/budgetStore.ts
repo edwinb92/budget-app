@@ -18,6 +18,8 @@ interface BudgetState {
   expenses: Expense[];
 
   addExpense: (draft: DraftExpense) => void;
+  updateExpense: (id: string, patch: { amount?: number; note?: string }) => void;
+  deleteExpense: (id: string) => void;
   addCategory: (input: CategoryInput) => void;
   updateCategory: (id: string, patch: Partial<CategoryInput>) => void;
   deleteCategory: (id: string) => void;
@@ -59,6 +61,54 @@ export const useBudgetStore = create<BudgetState>((set) => ({
       ),
       summary: { ...s.summary, spent: s.summary.spent + draft.amount },
     }));
+  },
+
+  updateExpense: (id, patch) => {
+    set((s) => {
+      const existing = s.expenses.find((e) => e.id === id);
+      if (!existing) return s;
+
+      const nextAmount =
+        typeof patch.amount === 'number' && patch.amount > 0
+          ? patch.amount
+          : existing.amount;
+      const nextNote =
+        typeof patch.note === 'string' ? patch.note : existing.note;
+
+      const delta = nextAmount - existing.amount;
+
+      return {
+        expenses: s.expenses.map((e) =>
+          e.id === id ? { ...e, amount: nextAmount, note: nextNote } : e,
+        ),
+        categories: s.categories.map((c) =>
+          c.id === existing.categoryId
+            ? { ...c, spent: c.spent + delta }
+            : c,
+        ),
+        summary: { ...s.summary, spent: s.summary.spent + delta },
+      };
+    });
+  },
+
+  deleteExpense: (id) => {
+    set((s) => {
+      const existing = s.expenses.find((e) => e.id === id);
+      if (!existing) return s;
+
+      return {
+        expenses: s.expenses.filter((e) => e.id !== id),
+        categories: s.categories.map((c) =>
+          c.id === existing.categoryId
+            ? { ...c, spent: Math.max(0, c.spent - existing.amount) }
+            : c,
+        ),
+        summary: {
+          ...s.summary,
+          spent: Math.max(0, s.summary.spent - existing.amount),
+        },
+      };
+    });
   },
 
   addCategory: (input) => {

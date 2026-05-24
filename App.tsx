@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ExpenseEditorSheet } from '@/components/activity';
 import { CategoryEditor } from '@/components/categories';
 import {
   CreateHouseholdModal,
@@ -67,6 +68,7 @@ const Shell: React.FC = () => {
       <TabBar />
       <ExpenseWizard />
       <CategoryEditor />
+      <ExpenseEditorSheet />
       <HouseholdPickerSheet />
       <CreateHouseholdModal />
       <ManageHouseholdModal />
