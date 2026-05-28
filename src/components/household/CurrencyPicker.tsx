@@ -10,12 +10,8 @@ interface CurrencyPickerProps {
 }
 
 const CURRENCIES: { code: CurrencyCode; label: string }[] = [
+  { code: 'CRC', label: 'CRC · ₡' },
   { code: 'USD', label: 'USD · $' },
-  { code: 'EUR', label: 'EUR · €' },
-  { code: 'COP', label: 'COP · $' },
-  { code: 'ARS', label: 'ARS · $' },
-  { code: 'MXN', label: 'MXN · $' },
-  { code: 'GBP', label: 'GBP · £' },
 ];
 
 export const CurrencyPicker: React.FC<CurrencyPickerProps> = ({

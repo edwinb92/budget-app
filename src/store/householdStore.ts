@@ -1,11 +1,7 @@
 import { create } from 'zustand';
 
-import {
-  mockCurrentUserId,
-  mockHouseholds,
-  mockMemberships,
-  mockUsers,
-} from '@/data/mockData';
+import { supabase } from '@/lib/supabase';
+import type { AccentName } from '@/theme';
 import type {
   CurrencyCode,
   Household,
@@ -19,106 +15,153 @@ interface HouseholdState {
   households: Household[];
   memberships: Membership[];
   activeHouseholdId: string;
+  loading: boolean;
 
+  fetchAll: () => Promise<void>;
+  reset: () => void;
   setActiveHousehold: (id: string) => void;
-  createHousehold: (input: { name: string; currency: CurrencyCode }) => string;
-  renameHousehold: (id: string, name: string) => void;
-  setHouseholdCurrency: (id: string, currency: CurrencyCode) => void;
-  removeUserFromHousehold: (householdId: string, userId: string) => void;
-  deleteHousehold: (id: string) => void;
-  addMembership: (input: { householdId: string; userId: string; role: Membership['role'] }) => void;
-  updateUser: (userId: string, patch: Partial<Pick<User, 'name' | 'email'>>) => void;
+  createHousehold: (input: { name: string; currency: CurrencyCode }) => Promise<void>;
+  renameHousehold: (id: string, name: string) => Promise<void>;
+  setHouseholdCurrency: (id: string, currency: CurrencyCode) => Promise<void>;
+  removeUserFromHousehold: (householdId: string, userId: string) => Promise<void>;
+  deleteHousehold: (id: string) => Promise<void>;
+  addMembership: (input: { householdId: string; userId: string; role: Membership['role'] }) => Promise<void>;
+  updateUser: (userId: string, patch: Partial<Pick<User, 'name' | 'email'>>) => Promise<void>;
 }
 
-const makeId = (prefix: string): string =>
-  `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+const mapProfile = (p: {
+  id: string;
+  name: string;
+  email: string;
+  accent: string;
+}): User => ({
+  id: p.id,
+  name: p.name,
+  email: p.email,
+  accent: p.accent as AccentName,
+  initial: (p.name.trim().charAt(0) || '?').toUpperCase(),
+});
 
-export const useHouseholdStore = create<HouseholdState>((set) => ({
-  currentUserId: mockCurrentUserId,
-  users: mockUsers,
-  households: mockHouseholds,
-  memberships: mockMemberships,
-  activeHouseholdId: mockHouseholds[0]?.id ?? '',
+export const useHouseholdStore = create<HouseholdState>((set, get) => ({
+  currentUserId: '',
+  users: [],
+  households: [],
+  memberships: [],
+  activeHouseholdId: '',
+  loading: false,
+
+  fetchAll: async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const userId = session?.user.id ?? '';
+    if (!userId) {
+      get().reset();
+      return;
+    }
+
+    set({ loading: true });
+
+    const [profilesRes, householdsRes, membershipsRes] = await Promise.all([
+      supabase.from('profiles').select('id, name, email, accent'),
+      supabase
+        .from('households')
+        .select('id, name, currency, createdBy:created_by, createdAt:created_at'),
+      supabase
+        .from('memberships')
+        .select('householdId:household_id, userId:user_id, role, joinedAt:joined_at'),
+    ]);
+
+    const users = (profilesRes.data ?? []).map(mapProfile);
+    const households = (householdsRes.data ?? []) as Household[];
+    const memberships = (membershipsRes.data ?? []) as Membership[];
+
+    set((s) => ({
+      currentUserId: userId,
+      users,
+      households,
+      memberships,
+      activeHouseholdId:
+        households.find((h) => h.id === s.activeHouseholdId)?.id ??
+        households[0]?.id ??
+        '',
+      loading: false,
+    }));
+  },
+
+  reset: () =>
+    set({
+      currentUserId: '',
+      users: [],
+      households: [],
+      memberships: [],
+      activeHouseholdId: '',
+      loading: false,
+    }),
 
   setActiveHousehold: (id) => set({ activeHouseholdId: id }),
 
-  createHousehold: ({ name, currency }) => {
-    const id = makeId('h');
-    set((s) => {
-      const household: Household = {
-        id,
-        name: name.trim(),
-        createdBy: s.currentUserId,
-        createdAt: Date.now(),
-        currency,
-      };
-      const membership: Membership = {
-        householdId: id,
-        userId: s.currentUserId,
-        role: 'owner',
-        joinedAt: Date.now(),
-      };
-      return {
-        households: [...s.households, household],
-        memberships: [...s.memberships, membership],
-        activeHouseholdId: id,
-      };
+  createHousehold: async ({ name, currency }) => {
+    const userId = get().currentUserId;
+    if (!userId) return;
+
+    const { data, error } = await supabase
+      .from('households')
+      .insert({ name: name.trim(), currency, created_by: userId })
+      .select('id')
+      .single();
+    if (error || !data) return;
+
+    await supabase.from('memberships').insert({
+      household_id: data.id,
+      user_id: userId,
+      role: 'owner',
     });
-    return id;
+
+    await get().fetchAll();
+    set({ activeHouseholdId: data.id });
   },
 
-  renameHousehold: (id, name) =>
-    set((s) => ({
-      households: s.households.map((h) =>
-        h.id === id ? { ...h, name: name.trim() } : h,
-      ),
-    })),
+  renameHousehold: async (id, name) => {
+    await supabase.from('households').update({ name: name.trim() }).eq('id', id);
+    await get().fetchAll();
+  },
 
-  setHouseholdCurrency: (id, currency) =>
-    set((s) => ({
-      households: s.households.map((h) =>
-        h.id === id ? { ...h, currency } : h,
-      ),
-    })),
+  setHouseholdCurrency: async (id, currency) => {
+    await supabase.from('households').update({ currency }).eq('id', id);
+    await get().fetchAll();
+  },
 
-  removeUserFromHousehold: (householdId, userId) =>
-    set((s) => ({
-      memberships: s.memberships.filter(
-        (m) => !(m.householdId === householdId && m.userId === userId),
-      ),
-    })),
+  removeUserFromHousehold: async (householdId, userId) => {
+    await supabase
+      .from('memberships')
+      .delete()
+      .eq('household_id', householdId)
+      .eq('user_id', userId);
+    await get().fetchAll();
+  },
 
-  deleteHousehold: (id) =>
-    set((s) => {
-      const households = s.households.filter((h) => h.id !== id);
-      const memberships = s.memberships.filter((m) => m.householdId !== id);
-      const activeHouseholdId =
-        s.activeHouseholdId === id
-          ? households[0]?.id ?? ''
-          : s.activeHouseholdId;
-      return { households, memberships, activeHouseholdId };
-    }),
+  deleteHousehold: async (id) => {
+    await supabase.from('households').delete().eq('id', id);
+    await get().fetchAll();
+  },
 
-  addMembership: ({ householdId, userId, role }) =>
-    set((s) => ({
-      memberships: [
-        ...s.memberships,
-        { householdId, userId, role, joinedAt: Date.now() },
-      ],
-    })),
+  addMembership: async ({ householdId, userId, role }) => {
+    await supabase.from('memberships').insert({
+      household_id: householdId,
+      user_id: userId,
+      role,
+    });
+    await get().fetchAll();
+  },
 
-  updateUser: (userId, patch) =>
-    set((s) => ({
-      users: s.users.map((u) => {
-        if (u.id !== userId) return u;
-        const nextName = patch.name?.trim();
-        return {
-          ...u,
-          ...(nextName ? { name: nextName, initial: nextName.charAt(0).toUpperCase() } : {}),
-          ...(patch.email !== undefined ? { email: patch.email.trim() } : {}),
-        };
-      }),
-    })),
+  updateUser: async (userId, patch) => {
+    const update: { name?: string; email?: string } = {};
+    if (patch.name !== undefined) update.name = patch.name.trim();
+    if (patch.email !== undefined) update.email = patch.email.trim();
+    await supabase.from('profiles').update(update).eq('id', userId);
+    await get().fetchAll();
+  },
 }));
 
 export const selectActiveHousehold = (s: HouseholdState): Household | undefined =>

@@ -38,13 +38,13 @@ export interface User {
   accent: AccentName;
 }
 
-export type CurrencyCode = 'USD' | 'EUR' | 'COP' | 'ARS' | 'MXN' | 'GBP';
+export type CurrencyCode = 'USD' | 'CRC';
 
 export interface Household {
   id: string;
   name: string;
   createdBy: string;
-  createdAt: number;
+  createdAt: string;
   currency: CurrencyCode;
 }
 
@@ -54,7 +54,7 @@ export interface Membership {
   householdId: string;
   userId: string;
   role: MembershipRole;
-  joinedAt: number;
+  joinedAt: string;
 }
 
 export interface Expense {

@@ -9,10 +9,7 @@ import type {
   Bill,
   BudgetCategory,
   Expense,
-  Household,
-  Membership,
   MonthlySummary,
-  User,
 } from '@/types';
 
 export const mockSummary: MonthlySummary = {
@@ -69,82 +66,6 @@ export const mockCategories: BudgetCategory[] = [
     accent: 'mint',
     budgeted: 200,
     spent: 60,
-  },
-];
-
-export const mockUsers: User[] = [
-  {
-    id: 'u-edan',
-    name: 'Edan',
-    email: 'edan_baga@yahoo.es',
-    initial: 'E',
-    accent: 'violet',
-  },
-  {
-    id: 'u-partner',
-    name: 'Partner',
-    email: 'partner@example.com',
-    initial: 'P',
-    accent: 'rose',
-  },
-  {
-    id: 'u-mom',
-    name: 'Mom',
-    email: 'mom@example.com',
-    initial: 'M',
-    accent: 'mint',
-  },
-];
-
-export const mockCurrentUserId = 'u-edan';
-
-export const mockHouseholds: Household[] = [
-  {
-    id: 'h-main',
-    name: 'Main Home',
-    createdBy: 'u-edan',
-    createdAt: Date.now() - 90 * 24 * 60 * 60 * 1000,
-    currency: 'USD',
-  },
-  {
-    id: 'h-japan',
-    name: 'Japan Trip',
-    createdBy: 'u-edan',
-    createdAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
-    currency: 'USD',
-  },
-];
-
-export const mockMemberships: Membership[] = [
-  {
-    householdId: 'h-main',
-    userId: 'u-edan',
-    role: 'owner',
-    joinedAt: Date.now() - 90 * 24 * 60 * 60 * 1000,
-  },
-  {
-    householdId: 'h-main',
-    userId: 'u-partner',
-    role: 'member',
-    joinedAt: Date.now() - 80 * 24 * 60 * 60 * 1000,
-  },
-  {
-    householdId: 'h-japan',
-    userId: 'u-edan',
-    role: 'owner',
-    joinedAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
-  },
-  {
-    householdId: 'h-japan',
-    userId: 'u-partner',
-    role: 'member',
-    joinedAt: Date.now() - 12 * 24 * 60 * 60 * 1000,
-  },
-  {
-    householdId: 'h-japan',
-    userId: 'u-mom',
-    role: 'member',
-    joinedAt: Date.now() - 10 * 24 * 60 * 60 * 1000,
   },
 ];
 

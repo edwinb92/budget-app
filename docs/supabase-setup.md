@@ -25,7 +25,7 @@ Cada paso es un bloque independiente — ejecutalo, verificá que no haya errore
 - [x] Paso 12 — Variables de entorno (URL + anon key)
 - [x] Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton
 - [x] Paso 14 — Auth flow (sign up / sign in / sign out)
-- [ ] Paso 15 — Reemplazar `householdStore` mock con queries reales
+- [x] Paso 15 — Reemplazar `householdStore` mock con queries reales
 - [ ] Paso 16 — Reemplazar `budgetStore` mock con queries reales (categories, expenses, bills)
 - [ ] Paso 17 — Suscripciones Realtime para updates en vivo entre miembros
 
@@ -679,8 +679,13 @@ create policy "profiles_self_update" on public.profiles
 - Borrar: solo el creador original (`created_by`). Tener role `owner` no es suficiente para borrar — solo el que lo creó tiene esa autoridad.
 
 ```sql
+-- El `or created_by = auth.uid()` es necesario para que el INSERT ... RETURNING
+-- (que hace supabase-js con .insert().select()) pueda devolver la fila recién
+-- creada ANTES de que exista la membership del creador.
 create policy "households_read" on public.households
-  for select using (public.is_member_of(id));
+  for select using (
+    public.is_member_of(id) or created_by = auth.uid()
+  );
 
 create policy "households_insert" on public.households
   for insert with check (created_by = auth.uid());
@@ -1191,9 +1196,55 @@ Esto significa que por ahora hay una desconexión: estás logueado como tu user 
 
 ## Paso 15 — Reemplazar `householdStore` mock con queries reales
 
-Cambiar las acciones del store para que hagan `supabase.from('households').select/insert/update/delete` en lugar de mutar arrays locales. Mismo para `memberships` y `profiles`.
+El `householdStore` pasa de tener arrays en memoria a leer/escribir contra Supabase. La forma del estado (`currentUserId`, `users`, `households`, `memberships`, `activeHouseholdId`) y los selectores se mantienen **idénticos**, así que los componentes que lo consumen no cambian.
 
-> Pendiente.
+### Decisiones aplicadas
+
+- **Aliasing en los `select`**: para mantener los types en camelCase sin tocar componentes, los selects renombran las columnas. Ej: `.select('id, name, currency, createdBy:created_by, createdAt:created_at')`. La sintaxis de Supabase es `aliasCamelCase:columna_snake_case`.
+- **Refetch tras cada mutación**: cada `create`/`update`/`delete` hace su llamada a Supabase y después llama a `fetchAll()` para recargar el estado. Simple y siempre consistente.
+- **`currentUserId` viene de la sesión**: ya no es mock; sale de `supabase.auth.getSession()`.
+
+### Cambios de tipos y datos
+
+- **`CurrencyCode`** se angostó a `'USD' | 'CRC'` (antes tenía 6). El `CurrencyPicker` ahora solo ofrece esas dos. Esto es necesario porque el enum de la DB solo acepta esos dos valores — un insert con otro fallaría.
+- **`Household.createdAt` y `Membership.joinedAt`** pasaron de `number` a `string` (la DB devuelve timestamps ISO). No se usan en ningún cálculo de fecha, así que el cambio es seguro.
+- **`mockData.ts`** ya no exporta `mockUsers`, `mockCurrentUserId`, `mockHouseholds`, `mockMemberships` — el store ya no los usa. (Los mocks de categories/expenses/bills siguen ahí hasta el Paso 16.)
+
+### Cómo funciona el fetch inicial
+
+En `App.tsx`, el componente `Root` observa el `userId` de la sesión:
+- Cuando hay login (userId aparece) → `householdStore.fetchAll()` carga profiles + households + memberships.
+- Cuando hay logout (userId → null) → `householdStore.reset()` limpia todo.
+- Usamos `userId` como dependencia (no el objeto `session` entero) para no recargar en cada refresh de token.
+
+### Cómo probar
+
+1. Reiniciá el server (`npx expo start -c`).
+2. Logueate. Como tu cuenta de auth es nueva, **probablemente no tengas ningún household** todavía — la app va a verse sin budget activo (el selector de household no aparece). Esto es correcto.
+3. Andá a *Settings → Create new budget* (o el botón de crear) y creá uno. Debería:
+   - Insertarse en `households` con vos como `created_by`
+   - Crear tu membership como `owner`
+   - Aparecer como budget activo
+4. Verificá en Supabase:
+   ```sql
+   select h.name, h.currency, p.email as creador
+   from public.households h
+   join public.profiles p on p.id = h.created_by
+   order by h.created_at desc;
+
+   select h.name, pr.email, m.role
+   from public.memberships m
+   join public.households h on h.id = m.household_id
+   join public.profiles pr on pr.id = m.user_id;
+   ```
+5. Probá renombrar el budget y cambiar la moneda desde *Manage budget* — los cambios deben persistir (cerrá/reabrí la app para confirmar).
+
+### Limitaciones conocidas (a resolver después)
+
+- **Editar el nombre de OTRO miembro no funciona**: la policy `profiles_self_update` solo permite editar tu propio profile. El feature "Edit member" del `ManageHouseholdModal` que permite renombrar a cualquiera fue diseñado con datos mock; contra la DB real, editar a otro miembro hace un no-op silencioso. Tiene sentido: el `name` de un profile es global a esa persona en todos sus households — un owner no debería poder renombrar el perfil global de otro. **Decisión pendiente**: restringir "Edit member" a solo el usuario actual, o quitarlo.
+- **Invitar miembros sigue siendo simulado**: el `InviteMemberSheet` muestra "Invitation sent" pero no agrega a nadie. Para invitar de verdad necesitamos un flujo de invitaciones (tabla `invitations` + aceptar por link), que es un feature aparte.
+- **`createHousehold` hace 2 inserts no atómicos** (household + membership). Si el segundo fallara, quedaría un household sin miembros. Para hacerlo atómico se puede mover a una función RPC de Postgres más adelante.
+- **categories/expenses/bills siguen mock** hasta el Paso 16, así que el Dashboard va a mezclar tu budget real con categorías/gastos falsos.
 
 ---
 
