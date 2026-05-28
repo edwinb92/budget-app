@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,9 +15,11 @@ import { QuickAddButton } from '@/components/dashboard';
 import { TabBar } from '@/components/navigation/TabBar';
 import { ExpenseWizard } from '@/components/wizard';
 import { ActivityFeedScreen } from '@/screens/ActivityFeedScreen';
+import { AuthScreen } from '@/screens/auth';
 import { CategoriesScreen } from '@/screens/CategoriesScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
+import { initAuth, useAuthStore } from '@/store/authStore';
 import { useNavStore } from '@/store/navStore';
 import { useWizardStore } from '@/store/wizardStore';
 import { colors, spacing } from '@/theme';
@@ -76,12 +78,29 @@ const Shell: React.FC = () => {
   );
 };
 
+const Root: React.FC = () => {
+  const session = useAuthStore((s) => s.session);
+  const initializing = useAuthStore((s) => s.initializing);
+
+  useEffect(() => initAuth(), []);
+
+  if (initializing) {
+    return (
+      <View style={[styles.root, styles.centered]}>
+        <ActivityIndicator color={colors.primary} size="large" />
+      </View>
+    );
+  }
+
+  return session ? <Shell /> : <AuthScreen />;
+};
+
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaProvider>
         <StatusBar style="dark" />
-        <Shell />
+        <Root />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
@@ -95,6 +114,10 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  centered: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   fabLayer: {
     position: 'absolute',

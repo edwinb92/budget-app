@@ -10,6 +10,7 @@ import {
 
 import { SettingsRow, SettingsSection } from '@/components/settings';
 import { ScreenContainer } from '@/components/ui';
+import { useAuthStore } from '@/store/authStore';
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
 import {
   selectActiveHousehold,
@@ -26,6 +27,7 @@ export const SettingsScreen: React.FC = () => {
 
   const openCreate = useHouseholdEditorStore((s) => s.openCreate);
   const openManage = useHouseholdEditorStore((s) => s.openManage);
+  const signOut = useAuthStore((s) => s.signOut);
 
   return (
     <ScreenContainer>
@@ -121,9 +123,7 @@ export const SettingsScreen: React.FC = () => {
           label="Log out"
           destructive
           showChevron={false}
-          onPress={() => {
-            // Logout lands with Supabase Auth
-          }}
+          onPress={signOut}
           isLast
         />
       </SettingsSection>

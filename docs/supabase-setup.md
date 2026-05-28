@@ -24,7 +24,7 @@ Cada paso es un bloque independiente — ejecutalo, verificá que no haya errore
 
 - [x] Paso 12 — Variables de entorno (URL + anon key)
 - [x] Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton
-- [ ] Paso 14 — Auth flow (sign up / sign in / sign out)
+- [x] Paso 14 — Auth flow (sign up / sign in / sign out)
 - [ ] Paso 15 — Reemplazar `householdStore` mock con queries reales
 - [ ] Paso 16 — Reemplazar `budgetStore` mock con queries reales (categories, expenses, bills)
 - [ ] Paso 17 — Suscripciones Realtime para updates en vivo entre miembros
@@ -1134,11 +1134,58 @@ Borrá ese `useEffect` de prueba una vez confirmes que conecta.
 
 ---
 
-## Paso 14 — Auth flow (sign up / sign in / sign out)
+## Paso 14 — Auth flow (sign up / sign in / sign out)  *(completado)*
 
-Pantallas de registro y login, manejar la sesión con `supabase.auth.onAuthStateChange`, redirigir al Dashboard cuando hay sesión. Reemplaza `mockCurrentUserId`.
+Este paso "cierra" la app detrás de un login: sin sesión ves la pantalla de auth, con sesión ves la app normal.
 
-> Pendiente — implica nuevas pantallas y modificar el árbol de navegación.
+### Config previa en Supabase — apagar confirmación de email
+
+Para desarrollar más rápido, desactivamos la confirmación por email (decisión tomada para esta etapa):
+
+1. Dashboard → *Authentication → Sign In / Providers → Email*
+2. Desactivá el toggle **"Confirm email"**
+3. Guardá
+
+Con esto, un signup crea la sesión al instante (sin tener que clickear un link en el correo). **Antes de producción hay que reactivarlo.**
+
+### Archivos creados / modificados
+
+- **`src/store/authStore.ts`** (nuevo) — store de Zustand que guarda la `session` y expone `signIn`, `signUp`, `signOut`. Incluye `initAuth()` que llama a `getSession()` al arrancar y se suscribe a `onAuthStateChange`.
+- **`src/screens/auth/AuthScreen.tsx`** (nuevo) — una sola pantalla con toggle Sign in / Sign up. Valida email, password (mín. 6 chars) y nombre (en signup).
+- **`App.tsx`** (modificado) — nuevo componente `Root` que gatea: spinner mientras inicializa → `AuthScreen` si no hay sesión → `Shell` si hay sesión.
+- **`src/screens/SettingsScreen.tsx`** (modificado) — el botón "Log out" ahora llama a `signOut`.
+
+### Cómo funciona el flujo
+
+1. Al arrancar, `initAuth()` pregunta a Supabase si hay una sesión guardada (persistida en AsyncStorage del Paso 13). Mientras tanto, `initializing = true` y se muestra el spinner.
+2. Cuando responde, `initializing = false`. Si hay sesión → `Shell` (la app). Si no → `AuthScreen`.
+3. En signup, mandamos `options.data.name` — ese valor llega a `raw_user_meta_data` y el trigger `handle_new_user` (Paso 2) lo usa para crear el row en `profiles` automáticamente.
+4. `onAuthStateChange` mantiene el store sincronizado: al hacer login/logout, la UI cambia sola sin recargar.
+
+### Cómo probar
+
+1. Reiniciá el server (`npx expo start -c`).
+2. Deberías ver la **pantalla de login** (ya no la app directamente).
+3. Tocá "Sign up", creá una cuenta con tu email + password. Al enviar, deberías entrar directo al Dashboard.
+4. Andá a *Settings → Log out*. Deberías volver a la pantalla de login.
+5. Volvé a entrar con "Sign in" usando las mismas credenciales.
+6. **Cerrá y reabrí la app** — deberías seguir logueado (sesión persistida).
+
+Verificá en Supabase que tu signup creó todo:
+
+```sql
+-- Debe aparecer tu nuevo user
+select id, email from auth.users order by created_at desc limit 1;
+
+-- Y su profile creado por el trigger
+select id, name, email from public.profiles order by created_at desc limit 1;
+```
+
+### Estado intermedio esperado (importante)
+
+Después de loguearte, la app va a mostrar los **datos mock todavía** (categorías, gastos, households de `mockData.ts`). Eso es correcto en este punto: el auth ya funciona, pero los stores (`householdStore`, `budgetStore`) siguen usando datos falsos. Los conectamos a Supabase en los **Pasos 15-16**.
+
+Esto significa que por ahora hay una desconexión: estás logueado como tu user real de Supabase, pero ves datos mock que no le pertenecen. Es esperado y temporal.
 
 ---
 
