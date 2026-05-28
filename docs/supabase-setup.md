@@ -18,12 +18,12 @@ Cada paso es un bloque independiente — ejecutalo, verificá que no haya errore
 - [x] Paso 8 — `bills`
 - [x] Paso 9 — Policies de RLS en todas las tablas
 - [x] Paso 10 — Vista `categories_with_spent`
-- [ ] Paso 11 — Habilitar Realtime
+- [x] Paso 11 — Habilitar Realtime
 
 **Conectar el frontend**
 
-- [ ] Paso 12 — Variables de entorno (URL + anon key)
-- [ ] Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton
+- [x] Paso 12 — Variables de entorno (URL + anon key)
+- [x] Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton
 - [ ] Paso 14 — Auth flow (sign up / sign in / sign out)
 - [ ] Paso 15 — Reemplazar `householdStore` mock con queries reales
 - [ ] Paso 16 — Reemplazar `budgetStore` mock con queries reales (categories, expenses, bills)
@@ -935,11 +935,70 @@ El `spent` de Food debería haberse incrementado en 5000 sin que vos tuvieras qu
 
 ---
 
-## Paso 11 — Habilitar Realtime
+## Paso 11 — Habilitar Realtime  *(completado)*
 
-En *Database → Replication* del dashboard, activar replication para las tablas compartidas (`households`, `memberships`, `categories`, `expenses`, `bills`). Permite que los miembros vean cambios sin recargar.
+### ¿Qué es Realtime y por qué lo queremos?
 
-> Pendiente — no requiere SQL, solo clicks en el dashboard.
+**Supabase Realtime** permite que el cliente reciba notificaciones automáticas cuando cambian filas en una tabla — sin tener que hacer polling ni pull-to-refresh. Por debajo usa la **replicación lógica de Postgres**: cada `insert`/`update`/`delete` en una tabla "publicada" se transmite por un canal WebSocket al que los clientes pueden suscribirse.
+
+Para este app es el ingrediente que hace que el budget se sienta verdaderamente *compartido*: cuando tu pareja agrega un gasto desde su teléfono, el tuyo lo muestra en segundos sin que toques nada.
+
+**Importante**: este paso solo **habilita** la capacidad (le dice a Postgres "estas tablas deben transmitir sus cambios"). El código que se suscribe y refresca el store vive en el cliente y lo escribimos en el **Paso 17**. Habilitar Realtime acá no rompe nada ni cambia el comportamiento actual — simplemente deja la puerta abierta.
+
+### Qué tablas habilitar
+
+Las cinco tablas que contienen datos compartidos del household:
+
+- `households` — para ver cuando se renombra o cambia de moneda
+- `memberships` — para ver cuando entra/sale un miembro
+- `categories` — para ver categorías nuevas o presupuestos editados
+- `expenses` — el más importante: gastos en vivo
+- `bills` — cuentas pagadas/pendientes
+
+> `profiles` **no** lo habilitamos — los perfiles casi no cambian y no aportan al "feed en vivo".
+
+### Opción A — Desde el dashboard (recomendado)
+
+1. Andá a *Database → Publications* en el menú lateral de Supabase.
+2. Vas a ver una publication llamada **`supabase_realtime`**. Hacé click en ella (o en el ícono de editar / "Source").
+3. Activá el toggle de las cinco tablas: `households`, `memberships`, `categories`, `expenses`, `bills`.
+4. Guardá.
+
+> En algunas versiones del dashboard esto está en *Database → Replication*. El concepto es el mismo: agregar tablas a la publication `supabase_realtime`.
+
+### Opción B — Por SQL (si preferís dejarlo versionado)
+
+Equivale exactamente a los toggles del dashboard:
+
+```sql
+alter publication supabase_realtime add table public.households;
+alter publication supabase_realtime add table public.memberships;
+alter publication supabase_realtime add table public.categories;
+alter publication supabase_realtime add table public.expenses;
+alter publication supabase_realtime add table public.bills;
+```
+
+> Si una tabla ya estaba agregada, el comando falla con `table is already member of publication`. No pasa nada — significa que ya estaba habilitada.
+
+### Realtime y RLS
+
+Un detalle clave de seguridad: **Realtime respeta las RLS policies**. Cuando un cliente se suscribe a cambios de `expenses`, solo recibe eventos de las filas que su user tiene permiso de ver (según las policies del Paso 9). No vas a recibir notificaciones de gastos de households ajenos. Esto funciona automáticamente porque el canal de Realtime evalúa las policies con el `auth.uid()` del cliente suscrito.
+
+### Cómo verificar que funcionó
+
+```sql
+-- Listar las tablas incluidas en la publication de realtime
+select schemaname, tablename
+from pg_publication_tables
+where pubname = 'supabase_realtime'
+order by tablename;
+```
+
+Deberías ver las cinco tablas (`bills`, `categories`, `expenses`, `households`, `memberships`).
+
+**Prueba visual rápida** (opcional): en el dashboard, andá a *Realtime → Inspector* (o la pestaña de Realtime). Suscribite al canal de `expenses`, y en otra pestaña del SQL Editor insertá un expense de prueba. Deberías ver el evento aparecer en el inspector en tiempo real. Esto confirma que la transmisión funciona aun antes de tocar el cliente.
+
+> **Recordatorio**: el "wow factor" real lo vas a ver en el Paso 17, cuando el cliente se suscriba a estos canales y actualice la UI sola. Por ahora con habilitarlo alcanza.
 
 ---
 
@@ -947,19 +1006,131 @@ En *Database → Replication* del dashboard, activar replication para las tablas
 
 A partir de acá ya no se ejecuta SQL en Supabase — se reemplaza el `mockData` del cliente por queries reales.
 
-## Paso 12 — Variables de entorno
+## Paso 12 — Variables de entorno  *(completado)*
 
-Crear `.env` con `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Documentar en `.env.example` y agregar `.env` al `.gitignore` si no está.
+A partir de acá ya no tocamos Supabase — empezamos a modificar el código del proyecto. El primer paso es darle al cliente las credenciales para conectarse.
 
-> Pendiente.
+### Cómo funcionan las env vars en Expo
+
+Expo (SDK 54) inyecta automáticamente cualquier variable que empiece con **`EXPO_PUBLIC_`** dentro del bundle del cliente, accesible vía `process.env.EXPO_PUBLIC_NOMBRE`. No necesitás librerías extra ni configuración en `app.json`. La condición es el prefijo `EXPO_PUBLIC_` — sin él, la variable no llega al cliente.
+
+### Dónde sacar los valores
+
+En el dashboard de Supabase: *Project Settings → API* (URL) y *Project Settings → API Keys* (la key). Vas a necesitar dos cosas:
+
+- **Project URL** → algo como `https://abcdefgh.supabase.co`
+- **Publishable key** → empieza con `sb_publishable_...`
+
+> **Nota sobre el sistema nuevo de keys**: los proyectos recientes de Supabase usan un formato nuevo de API keys:
+> - **`sb_publishable_...`** (publishable key) → la que va en el cliente. Reemplaza la vieja "anon key". **No es un JWT.**
+> - **`sb_secret_...`** (secret key) → solo backend. Reemplaza el viejo `service_role`.
+> - **JWT Signing Key** → es la llave con la que Supabase firma internamente los JWTs de los usuarios logueados. Es infraestructura, **no va en tu código** — no la toques.
+>
+> Si tu proyecto fuera viejo verías en su lugar una `anon` key en formato JWT (`eyJ...`); ambas cumplen la misma función en el cliente. Nosotros usamos la **publishable key**.
+
+> **Sobre seguridad**: la publishable key es **pública por diseño** — está pensada para vivir en el cliente. Cualquiera que inspeccione tu app la puede ver, y está bien: lo que protege tus datos es el RLS que configuramos en el Paso 9, no el secreto de la key. **NUNCA** pongas la `secret` key ni la JWT Signing Key en el cliente.
+
+### Crear el archivo `.env`
+
+En la raíz del proyecto (junto a `package.json`), creá un archivo `.env`:
+
+```
+EXPO_PUBLIC_SUPABASE_URL=https://tu-project-ref.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...tu-publishable-key-completa
+```
+
+> Mantenemos el nombre de variable `EXPO_PUBLIC_SUPABASE_ANON_KEY` (es la convención que usa `supabase-js` y casi todos los ejemplos) aunque el *valor* sea ahora la publishable key. El cliente no distingue — solo le importa el valor.
+
+Ya dejé en el repo un **`.env.example`** con la plantilla — copialo a `.env` y reemplazá los valores. El `.gitignore` ya excluye `.env` (verificado), así que tus credenciales no se van a subir a git; el `.env.example` sí se commitea como referencia para vos o cualquier otro dev.
+
+### Después de crear el `.env`
+
+**Reiniciá el dev server** — Expo lee las env vars al arrancar, así que un servidor ya corriendo no las va a ver:
+
+```bash
+# Cortá el server actual (Ctrl+C) y volvé a arrancar
+npx expo start -c
+```
+
+El flag `-c` limpia la caché de Metro, que a veces se queda con valores viejos de env.
+
+### Cómo verificar (rápido, temporal)
+
+Podés agregar un `console.log` temporal en cualquier archivo que se ejecute al inicio (ej. `App.tsx`):
+
+```ts
+console.log('SUPABASE URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
+```
+
+Si en la consola de Metro ves la URL (y no `undefined`), las env vars están llegando. Borrá el `console.log` después.
+
+> **No corras esto todavía si no querés** — la verificación real viene en el Paso 13, cuando creemos el cliente de Supabase y hagamos una query de prueba.
 
 ---
 
-## Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton
+## Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton  *(completado)*
 
-`npm install @supabase/supabase-js` y crear `src/lib/supabase.ts` que exporte una instancia única configurada con las env vars.
+### Instalar las dependencias
 
-> Pendiente.
+Supabase en React Native necesita tres paquetes:
+
+```bash
+npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-url-polyfill
+```
+
+Por qué cada uno:
+
+- **`@supabase/supabase-js`** — el SDK oficial. Da `createClient`, queries, auth, realtime.
+- **`@react-native-async-storage/async-storage`** — React Native no tiene `localStorage`. Supabase lo usa para **persistir la sesión** del usuario entre reinicios del app (si no, habría que loguearse cada vez que se abre).
+- **`react-native-url-polyfill`** — `supabase-js` usa la API `URL` del navegador internamente; React Native no la trae completa, así que la polyfill la suple.
+
+> Usamos `npx expo install` (en vez de `npm install`) porque AsyncStorage es un módulo nativo y Expo elige la versión compatible con el SDK 54.
+
+### El cliente singleton
+
+Ya creé el archivo **`src/lib/supabase.ts`** en el repo. Exporta una única instancia de Supabase que el resto del app va a importar. Puntos clave de la config:
+
+```ts
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: AsyncStorage,        // persiste la sesión en el dispositivo
+    autoRefreshToken: true,       // renueva el token antes de que expire
+    persistSession: true,         // mantené la sesión entre reinicios
+    detectSessionInUrl: false,    // RN no usa sesiones vía URL (eso es solo web)
+  },
+});
+```
+
+- **`import 'react-native-url-polyfill/auto'`** al tope del archivo — debe ir antes de cualquier uso de Supabase para que la polyfill se registre.
+- **Validación de env vars** — si faltan, el cliente tira un error claro al arrancar en lugar de fallar de forma confusa más adelante.
+- **`AppState` listener** — pausa el auto-refresh del token cuando el app pasa a background y lo reanuda al volver. Es el patrón oficial recomendado por Supabase para RN (evita refrescos innecesarios mientras la app está cerrada).
+
+### Cómo verificar que la conexión funciona
+
+Agregá temporalmente esto en `App.tsx` (dentro del componente o como efecto al inicio) para hacer una query de prueba contra una tabla pública:
+
+```ts
+import { supabase } from '@/lib/supabase';
+
+// ... dentro de un useEffect en App o Shell:
+useEffect(() => {
+  supabase
+    .from('households')
+    .select('id, name')
+    .then(({ data, error }) => {
+      console.log('Supabase test →', { data, error });
+    });
+}, []);
+```
+
+Qué esperar en la consola de Metro:
+
+- **`data: []` y `error: null`** → ¡conexión exitosa! La lista vacía es correcta: todavía no hay sesión, así que RLS no deja ver ningún household (recordá que `households_read` requiere ser miembro, y sin login `auth.uid()` es `null`). Lo importante es que **no hay error de red ni de auth** — el cliente habló con Supabase y RLS hizo su trabajo.
+- **`error` con mensaje** → algo está mal: revisá la URL/key en `.env`, que reiniciaste el server con `-c`, y que instalaste las dependencias.
+
+Borrá ese `useEffect` de prueba una vez confirmes que conecta.
+
+> Si ves `data: []` sin error, estás listo: el cliente conecta y RLS funciona. En el **Paso 14** agregamos el login para que `auth.uid()` deje de ser `null` y empieces a ver tus datos reales.
 
 ---
 
