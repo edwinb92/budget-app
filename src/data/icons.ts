@@ -20,6 +20,10 @@ import {
   Gamepad2,
   Shirt,
   Fuel,
+  Wifi,
+  Zap,
+  Droplets,
+  Tv,
 } from 'lucide-react-native';
 
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -43,6 +47,10 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   games: Gamepad2,
   clothes: Shirt,
   fuel: Fuel,
+  wifi: Wifi,
+  zap: Zap,
+  droplets: Droplets,
+  tv: Tv,
 };
 
 export const ICON_KEYS = Object.keys(CATEGORY_ICONS);

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppCard } from '@/components/ui';
+import { getCategoryIcon } from '@/data/icons';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Bill } from '@/types';
 import { formatCurrency } from '@/utils/format';
@@ -13,7 +14,7 @@ interface BillCardProps {
 
 export const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
   const accent = colors.accents[bill.accent];
-  const Icon = bill.icon;
+  const Icon = getCategoryIcon(bill.iconKey);
   const isPaid = bill.status === 'paid';
 
   return (

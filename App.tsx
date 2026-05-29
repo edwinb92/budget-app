@@ -20,6 +20,7 @@ import { CategoriesScreen } from '@/screens/CategoriesScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { initAuth, useAuthStore } from '@/store/authStore';
+import { useBudgetStore } from '@/store/budgetStore';
 import { useHouseholdStore } from '@/store/householdStore';
 import { useNavStore } from '@/store/navStore';
 import { useWizardStore } from '@/store/wizardStore';
@@ -83,6 +84,7 @@ const Root: React.FC = () => {
   const session = useAuthStore((s) => s.session);
   const initializing = useAuthStore((s) => s.initializing);
   const userId = session?.user.id ?? null;
+  const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
 
   useEffect(() => initAuth(), []);
 
@@ -91,8 +93,17 @@ const Root: React.FC = () => {
       useHouseholdStore.getState().fetchAll();
     } else {
       useHouseholdStore.getState().reset();
+      useBudgetStore.getState().reset();
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (activeHouseholdId) {
+      useBudgetStore.getState().fetchForActiveHousehold();
+    } else {
+      useBudgetStore.getState().reset();
+    }
+  }, [activeHouseholdId]);
 
   if (initializing) {
     return (

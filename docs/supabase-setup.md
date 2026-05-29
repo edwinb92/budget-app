@@ -26,7 +26,7 @@ Cada paso es un bloque independiente — ejecutalo, verificá que no haya errore
 - [x] Paso 13 — Instalar `@supabase/supabase-js` + cliente singleton
 - [x] Paso 14 — Auth flow (sign up / sign in / sign out)
 - [x] Paso 15 — Reemplazar `householdStore` mock con queries reales
-- [ ] Paso 16 — Reemplazar `budgetStore` mock con queries reales (categories, expenses, bills)
+- [x] Paso 16 — Reemplazar `budgetStore` mock con queries reales (categories, expenses, bills)
 - [ ] Paso 17 — Suscripciones Realtime para updates en vivo entre miembros
 
 ---
@@ -1239,6 +1239,19 @@ En `App.tsx`, el componente `Root` observa el `userId` de la sesión:
    ```
 5. Probá renombrar el budget y cambiar la moneda desde *Manage budget* — los cambios deben persistir (cerrá/reabrí la app para confirmar).
 
+### Helper de debug `whoami()`
+
+Durante el debugging de la creación de budgets creamos esta función para confirmar qué `auth.uid()` ve el servidor en una request del cliente. La dejamos en la DB porque es útil para diagnosticar problemas de auth/RLS:
+
+```sql
+create or replace function public.whoami()
+returns uuid language sql stable
+as $$ select auth.uid(); $$;
+grant execute on function public.whoami() to authenticated, anon;
+```
+
+Desde el cliente: `const { data } = await supabase.rpc('whoami')` devuelve tu UUID si la sesión está bien, o `null` si PostgREST no está validando el token.
+
 ### Limitaciones conocidas (a resolver después)
 
 - **Editar el nombre de OTRO miembro no funciona**: la policy `profiles_self_update` solo permite editar tu propio profile. El feature "Edit member" del `ManageHouseholdModal` que permite renombrar a cualquiera fue diseñado con datos mock; contra la DB real, editar a otro miembro hace un no-op silencioso. Tiene sentido: el `name` de un profile es global a esa persona en todos sus households — un owner no debería poder renombrar el perfil global de otro. **Decisión pendiente**: restringir "Edit member" a solo el usuario actual, o quitarlo.
@@ -1250,9 +1263,56 @@ En `App.tsx`, el componente `Root` observa el `userId` de la sesión:
 
 ## Paso 16 — Reemplazar `budgetStore` mock con queries reales
 
-Mismo tratamiento para `categories` (vía `categories_with_spent`), `expenses` y `bills`. Manejar loading/error states.
+El `budgetStore` ahora lee/escribe categories, expenses y bills contra Supabase, **scopeados al household activo**. Cuando cambiás de budget (o se carga el inicial), refetchea todo.
 
-> Pendiente.
+### Cómo se conecta con el household activo
+
+`budgetStore` lee `useHouseholdStore.getState().activeHouseholdId` para saber qué household consultar. En `App.tsx`, un efecto observa `activeHouseholdId`:
+- Cuando hay household activo → `budgetStore.fetchForActiveHousehold()`
+- Cuando no hay (logout o sin budgets) → `budgetStore.reset()`
+
+Así, apenas se carga tu household (Paso 15) o cambiás de budget en el picker, los datos del budget se recargan solos.
+
+### Lecturas
+
+- **categories**: se leen de la **vista `categories_with_spent`** (Paso 10), no de la tabla cruda — así viene el `spent` calculado. Filtradas por `household_id`.
+- **expenses**: de la tabla `expenses`, ordenadas por `created_at desc`, filtradas por household.
+- **bills**: de la tabla `bills`, ordenadas por `due_day`.
+- **summary**: se **deriva en el cliente** — `budgeted` = suma de los presupuestos de categorías, `spent` = suma de los gastados. El `monthLabel` es el mes actual.
+
+### Detalles importantes que resolvimos
+
+- **Supabase devuelve columnas `numeric` como strings** (para no perder precisión). Por eso `budgeted`, `spent` y `amount` se pasan por `Number(...)` al mapear. Sin esto, las sumas concatenarían strings (`"100" + "50" = "10050"`).
+- **`Expense.createdAt`**: la DB devuelve `created_at` como timestamp ISO (string), pero el feed de Activity agrupa por día con aritmética de números (`groupByDay` en `utils/date.ts`). Al mapear convertimos con `new Date(iso).getTime()` → epoch ms. El tipo sigue siendo `number` y `date.ts` no se tocó.
+- **`Bill.icon`**: antes era un componente `LucideIcon` directo (del mock). La DB guarda `icon_key` (texto), así que el tipo pasó a `Bill.iconKey: string` y `BillCard` resuelve el ícono con `getCategoryIcon(iconKey)`, igual que las categorías. Se agregaron `wifi`, `zap`, `droplets`, `tv` al registro de íconos.
+- **`mockData.ts` se eliminó** — ya nada lo usa. Toda la data viene de Supabase.
+
+### Cómo probar
+
+1. Reiniciá (`npx expo start -c`) y logueate. Si ya creaste un budget en el Paso 15, debería estar activo.
+2. **Creá categorías** desde el tab Categories (botón "New"). Deberían persistir y aparecer en el Dashboard.
+3. **Agregá un gasto** con el botón "+" (wizard): elegí categoría, monto, nota y quién pagó. Al guardar:
+   - Aparece en Activity
+   - El `spent` de la categoría sube (Dashboard + Categories)
+   - El summary del Dashboard se actualiza
+4. **Editá/borrá un gasto** desde Activity (tap en la fila). Los totales se recalculan.
+5. Verificá en Supabase que todo persiste:
+   ```sql
+   select c.name, c.budgeted, cs.spent
+   from public.categories c
+   join public.categories_with_spent cs on cs.id = c.id;
+
+   select e.amount, e.note, c.name as categoria, p.name as pago
+   from public.expenses e
+   join public.categories c on c.id = e.category_id
+   join public.profiles p on p.id = e.paid_by_id
+   order by e.created_at desc;
+   ```
+
+### Limitaciones conocidas
+
+- **Borrar una categoría con gastos falla**: la FK `expenses.category_id` es `ON DELETE RESTRICT` (Paso 7). Si intentás borrar una categoría que tiene gastos, la DB lo rechaza y el store loguea un warning (`deleteCategory failed`). En el mock se borraban los gastos en cascada. **Decisión pendiente**: o cambiar la FK a `ON DELETE CASCADE` (borra los gastos con la categoría), o mostrar un mensaje al usuario ("borrá o reasigná los gastos primero"). Por ahora queda como no-op silencioso si hay gastos.
+- **El summary no filtra por mes**: `spent` es la suma acumulada de TODOS los gastos de la categoría (lo que da la vista), no solo del mes actual, aunque el `monthLabel` diga el mes corriente. Si más adelante querés vista mensual real, hay que filtrar expenses por rango de fecha.
 
 ---
 

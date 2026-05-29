@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Bell } from 'lucide-react-native';
+import { Bell, Receipt, Tags, type LucideIcon } from 'lucide-react-native';
 
 import {
   BillCard,
@@ -14,6 +14,16 @@ import { useBudgetStore } from '@/store/budgetStore';
 import { useNavStore } from '@/store/navStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { BudgetCategory } from '@/types';
+
+const SectionEmpty: React.FC<{ icon: LucideIcon; message: string }> = ({
+  icon: Icon,
+  message,
+}) => (
+  <View style={styles.empty}>
+    <Icon size={22} color={colors.text.faint} strokeWidth={2} />
+    <Text style={styles.emptyText}>{message}</Text>
+  </View>
+);
 
 export const DashboardScreen: React.FC = () => {
   const summary = useBudgetStore((s) => s.summary);
@@ -45,26 +55,41 @@ export const DashboardScreen: React.FC = () => {
 
         <View style={styles.section}>
           <SectionTitle title="Categories" actionLabel="See all" />
-          <View style={styles.grid}>
-            {categories.map((category, index) => (
-              <View
-                key={category.id}
-                style={[
-                  styles.gridItem,
-                  index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight,
-                ]}
-              >
-                <CategoryCard category={category} onPress={handleCategoryPress} />
-              </View>
-            ))}
-          </View>
+          {categories.length === 0 ? (
+            <SectionEmpty
+              icon={Tags}
+              message="No categories yet. Create one to start budgeting."
+            />
+          ) : (
+            <View style={styles.grid}>
+              {categories.map((category, index) => (
+                <View
+                  key={category.id}
+                  style={[
+                    styles.gridItem,
+                    index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight,
+                  ]}
+                >
+                  <CategoryCard
+                    category={category}
+                    onPress={handleCategoryPress}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.section}>
           <SectionTitle title="Bills" actionLabel="Manage" />
-          {bills.map((bill) => (
-            <BillCard key={bill.id} bill={bill} />
-          ))}
+          {bills.length === 0 ? (
+            <SectionEmpty
+              icon={Receipt}
+              message="No bills yet. Recurring payments will show up here."
+            />
+          ) : (
+            bills.map((bill) => <BillCard key={bill.id} bill={bill} />)
+          )}
         </View>
     </ScreenContainer>
   );
@@ -114,4 +139,21 @@ const styles = StyleSheet.create({
   },
   gridItemLeft: {},
   gridItemRight: {},
+  empty: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+    backgroundColor: 'transparent',
+  },
+  emptyText: {
+    ...typography.caption,
+    color: colors.text.faint,
+    textAlign: 'center',
+  },
 });

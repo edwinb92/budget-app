@@ -1,5 +1,4 @@
 import type { AccentName } from '@/theme';
-import type { LucideIcon } from 'lucide-react-native';
 
 export type CategoryId = string;
 
@@ -17,7 +16,7 @@ export type BillStatus = 'paid' | 'pending';
 export interface Bill {
   id: string;
   name: string;
-  icon: LucideIcon;
+  iconKey: string;
   accent: AccentName;
   amount: number;
   status: BillStatus;
