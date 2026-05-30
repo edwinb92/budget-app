@@ -27,7 +27,7 @@ Cada paso es un bloque independiente — ejecutalo, verificá que no haya errore
 - [x] Paso 14 — Auth flow (sign up / sign in / sign out)
 - [x] Paso 15 — Reemplazar `householdStore` mock con queries reales
 - [x] Paso 16 — Reemplazar `budgetStore` mock con queries reales (categories, expenses, bills)
-- [ ] Paso 17 — Suscripciones Realtime para updates en vivo entre miembros
+- [x] Paso 17 — Suscripciones Realtime para updates en vivo entre miembros
 
 ---
 
@@ -1318,6 +1318,73 @@ Así, apenas se carga tu household (Paso 15) o cambiás de budget en el picker, 
 
 ## Paso 17 — Suscripciones Realtime
 
-Suscribirse con `supabase.channel(...)` a cambios en `expenses` y `categories` del household activo, refrescar el store local cuando lleguen eventos de otros miembros.
+El paso final: cuando otro miembro del household cambia algo desde su dispositivo, tu app lo refleja **sin recargar**. Es lo que vuelve "vivo" al budget compartido.
 
-> Pendiente — el "wow factor" del app compartido.
+### Cómo funciona
+
+Creamos **`src/lib/realtime.ts`** con `subscribeToHousehold(householdId)`, que abre un canal de Supabase Realtime y escucha cambios (`postgres_changes`, evento `*` = insert/update/delete) en las tablas del household:
+
+- `expenses`, `categories`, `bills` → al recibir un evento, llama `budgetStore.fetchForActiveHousehold()`
+- `memberships`, `households` → llama `householdStore.fetchAll()`
+
+Cada suscripción se filtra por `household_id=eq.<id>` (o `id=eq.<id>` para households), así solo recibís eventos de tu budget activo.
+
+En `App.tsx`, el efecto que observa `activeHouseholdId` ahora también abre la suscripción y la cierra (cleanup) cuando cambiás de budget o salís. El canal se llama `household:<id>` y se reemplaza al cambiar de household.
+
+### Realtime respeta RLS
+
+Solo recibís eventos de filas que tu user puede ver (según las policies del Paso 9). El filtrado de seguridad es automático — no hay forma de "espiar" cambios de households ajenos por el canal.
+
+### Patrón de refetch (consistente con el resto)
+
+Igual que las mutaciones, Realtime **refetchea** el store cuando llega un evento. No intentamos aplicar el cambio puntual (insert/update/delete) sobre el estado local — simplemente recargamos del servidor, que es más simple y siempre consistente.
+
+> **Doble refetch en acciones propias**: cuando vos hacés un cambio, refetcheás por la mutación Y además te llega tu propio evento de Realtime (otro refetch). Es una pequeña ineficiencia inofensiva. Si molestara, se podría filtrar el evento propio comparando el `paid_by_id`/autor, pero para esta escala no vale la complejidad.
+
+### Cómo probar (necesitás 2 sesiones)
+
+Realtime solo se nota con **dos usuarios en el mismo household**:
+
+1. Creá un segundo usuario (signup con otro email) y agregalo al household. Como el flujo de invitación real todavía no existe, agregá la membership manualmente en el SQL Editor:
+   ```sql
+   -- ids del household y del segundo profile
+   select id, name from public.households;
+   select id, email from public.profiles;
+
+   insert into public.memberships (household_id, user_id, role)
+   values ('<household_id>', '<segundo_profile_id>', 'member');
+   ```
+2. Abrí la app en **dos lugares**: tu dispositivo logueado como user 1, y otro dispositivo/emulador (o la versión web) logueado como user 2, ambos en el mismo household.
+3. Desde user 2, agregá un gasto. En la pantalla de user 1, el gasto debería aparecer en Activity y el `spent`/summary actualizarse **solos**, sin tocar nada.
+
+Si no tenés dos dispositivos a mano, podés simularlo: dejá la app abierta en el emulador y, desde el SQL Editor de Supabase, insertá un expense manualmente en tu household activo:
+
+```sql
+insert into public.expenses (household_id, category_id, paid_by_id, amount, note)
+values ('<household_id>', '<category_id>', '<tu_profile_id>', 9999, 'Test realtime');
+```
+
+El gasto debería aparecer en la app en segundos sin recargar.
+
+> Si los eventos no llegan: verificá que en el Paso 11 las tablas estén en la publication `supabase_realtime` (`select * from pg_publication_tables where pubname = 'supabase_realtime';`).
+
+---
+
+## ¡Backend + frontend conectados! 🎉
+
+Con el Paso 17 quedan completos los 17 pasos. La app pasó de mock data a un backend real con Supabase:
+
+- **Schema** con RLS multi-tenant (households, memberships, categories, expenses, bills, profiles)
+- **Auth** con sign up / sign in / sign out y sesión persistida
+- **CRUD real** de budgets, categorías y gastos, scopeado por household
+- **Realtime** para colaboración en vivo entre miembros
+
+### Pendientes documentados (no bloqueantes)
+
+Repasá las "Limitaciones conocidas" de los Pasos 15 y 16:
+- "Edit member" solo funciona para tu propio profile (RLS) — decidir si restringir o quitar
+- Invitar miembros sigue simulado — falta flujo de invitaciones real
+- `createHousehold` hace 2 inserts no atómicos — se puede mover a una RPC
+- Borrar categoría con gastos falla (FK restrict) — decidir cascade vs mensaje
+- Summary no filtra por mes
+- Antes de producción: reactivar "Confirm email" en Supabase Auth

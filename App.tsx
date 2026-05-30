@@ -19,6 +19,7 @@ import { AuthScreen } from '@/screens/auth';
 import { CategoriesScreen } from '@/screens/CategoriesScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
+import { subscribeToHousehold } from '@/lib/realtime';
 import { initAuth, useAuthStore } from '@/store/authStore';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useHouseholdStore } from '@/store/householdStore';
@@ -98,11 +99,13 @@ const Root: React.FC = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (activeHouseholdId) {
-      useBudgetStore.getState().fetchForActiveHousehold();
-    } else {
+    if (!activeHouseholdId) {
       useBudgetStore.getState().reset();
+      return;
     }
+    useBudgetStore.getState().fetchForActiveHousehold();
+    const unsubscribe = subscribeToHousehold(activeHouseholdId);
+    return unsubscribe;
   }, [activeHouseholdId]);
 
   if (initializing) {
