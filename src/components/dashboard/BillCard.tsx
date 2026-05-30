@@ -3,9 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { AppCard } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Bill } from '@/types';
-import { formatCurrency } from '@/utils/format';
 
 interface BillCardProps {
   bill: Bill;
@@ -13,6 +13,7 @@ interface BillCardProps {
 }
 
 export const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
+  const formatMoney = useFormatCurrency();
   const accent = colors.accents[bill.accent];
   const Icon = getCategoryIcon(bill.iconKey);
   const isPaid = bill.status === 'paid';
@@ -34,7 +35,7 @@ export const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
         </View>
 
         <View style={styles.right}>
-          <Text style={styles.amount}>{formatCurrency(bill.amount)}</Text>
+          <Text style={styles.amount}>{formatMoney(bill.amount)}</Text>
           <View
             style={[
               styles.statusPill,

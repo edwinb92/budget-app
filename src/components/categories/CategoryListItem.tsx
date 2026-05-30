@@ -4,9 +4,10 @@ import { ChevronRight } from 'lucide-react-native';
 
 import { ProgressBar } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { colors, radius, shadows, spacing, typography } from '@/theme';
 import type { BudgetCategory } from '@/types';
-import { clamp, formatCurrency, formatPercent } from '@/utils/format';
+import { clamp, formatPercent } from '@/utils/format';
 
 interface CategoryListItemProps {
   category: BudgetCategory;
@@ -17,6 +18,7 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
   category,
   onPress,
 }) => {
+  const formatMoney = useFormatCurrency();
   const accent = colors.accents[category.accent];
   const Icon = getCategoryIcon(category.iconKey);
   const remaining = category.budgeted - category.spent;
@@ -46,8 +48,8 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
             numberOfLines={1}
           >
             {overBudget
-              ? `${formatCurrency(Math.abs(remaining))} over`
-              : `${formatCurrency(remaining)} left`}
+              ? `${formatMoney(Math.abs(remaining))} over`
+              : `${formatMoney(remaining)} left`}
           </Text>
         </View>
 
@@ -64,7 +66,7 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
         </View>
 
         <Text style={styles.budget}>
-          {formatCurrency(category.spent)} of {formatCurrency(category.budgeted)}
+          {formatMoney(category.spent)} of {formatMoney(category.budgeted)}
         </Text>
       </View>
 

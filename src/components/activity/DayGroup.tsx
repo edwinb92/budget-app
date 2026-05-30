@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ExpenseRow } from '@/components/activity/ExpenseRow';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { colors, spacing, typography } from '@/theme';
 import type { Expense } from '@/types';
-import { formatCurrency } from '@/utils/format';
 
 interface DayGroupProps {
   label: string;
@@ -12,13 +12,14 @@ interface DayGroupProps {
 }
 
 export const DayGroup: React.FC<DayGroupProps> = ({ label, items }) => {
+  const formatMoney = useFormatCurrency();
   const total = items.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
         <Text style={styles.label}>{label}</Text>
-        <Text style={styles.total}>{formatCurrency(total)}</Text>
+        <Text style={styles.total}>{formatMoney(total)}</Text>
       </View>
 
       {items.map((expense) => (

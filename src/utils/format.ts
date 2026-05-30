@@ -1,13 +1,15 @@
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  CRC: '₡',
+};
+
+export const getCurrencySymbol = (currency: string): string =>
+  CURRENCY_SYMBOLS[currency] ?? currency;
+
 export const formatCurrency = (value: number, currency = 'USD'): string => {
-  try {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0,
-    }).format(value);
-  } catch {
-    return `$${Math.round(value).toLocaleString('en-US')}`;
-  }
+  const symbol = getCurrencySymbol(currency);
+  const num = Math.round(value).toLocaleString('en-US');
+  return `${symbol}${num}`;
 };
 
 export const formatPercent = (ratio: number): string => {

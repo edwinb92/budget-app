@@ -11,6 +11,10 @@ import { HouseholdSelector } from '@/components/household';
 import { ScreenContainer, SectionTitle } from '@/components/ui';
 import { useActivityFilterStore } from '@/store/activityFilterStore';
 import { useBudgetStore } from '@/store/budgetStore';
+import {
+  selectCurrentUser,
+  useHouseholdStore,
+} from '@/store/householdStore';
 import { useNavStore } from '@/store/navStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { BudgetCategory } from '@/types';
@@ -29,8 +33,12 @@ export const DashboardScreen: React.FC = () => {
   const summary = useBudgetStore((s) => s.summary);
   const categories = useBudgetStore((s) => s.categories);
   const bills = useBudgetStore((s) => s.bills);
+  const currentUser = useHouseholdStore(selectCurrentUser);
   const setActiveTab = useNavStore((s) => s.setActiveTab);
   const setCategoryFilter = useActivityFilterStore((s) => s.setCategoryFilter);
+
+  const firstName = currentUser?.name.trim().split(/\s+/)[0] ?? '';
+  const greeting = firstName ? `Hi, ${firstName}` : 'Hi';
 
   const handleCategoryPress = (category: BudgetCategory) => {
     setCategoryFilter(category.id);
@@ -41,7 +49,7 @@ export const DashboardScreen: React.FC = () => {
     <ScreenContainer>
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Hi, Edan</Text>
+            <Text style={styles.greeting}>{greeting}</Text>
             <Text style={styles.subgreeting}>{summary.monthLabel}</Text>
           </View>
           <View style={styles.bell}>

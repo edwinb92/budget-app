@@ -6,16 +6,17 @@ import { ActivityEmptyState, DayGroup } from '@/components/activity';
 import { HouseholdSelector } from '@/components/household';
 import { ScreenContainer } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { useActivityFilterStore } from '@/store/activityFilterStore';
 import { useBudgetStore } from '@/store/budgetStore';
 import { colors, radius, spacing, typography } from '@/theme';
-import { formatCurrency } from '@/utils/format';
 import { groupByDay } from '@/utils/date';
 
 export const ActivityFeedScreen: React.FC = () => {
   const allExpenses = useBudgetStore((s) => s.expenses);
   const categoryId = useActivityFilterStore((s) => s.categoryId);
   const clearFilter = useActivityFilterStore((s) => s.clearFilter);
+  const formatMoney = useFormatCurrency();
 
   const filterCategory = useBudgetStore((s) =>
     categoryId ? s.categories.find((c) => c.id === categoryId) : undefined,
@@ -56,7 +57,7 @@ export const ActivityFeedScreen: React.FC = () => {
               : 'Nothing here yet.'
             : `${expenses.length} ${
                 expenses.length === 1 ? 'expense' : 'expenses'
-              } · ${formatCurrency(totalThisMonth)}`}
+              } · ${formatMoney(totalThisMonth)}`}
         </Text>
       </View>
 

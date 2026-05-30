@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { useCurrencySymbol } from '@/hooks/useFormatCurrency';
 import { colors, radius, spacing, typography } from '@/theme';
 
 interface BudgetInputProps {
@@ -16,11 +17,12 @@ const sanitize = (input: string): number => {
 };
 
 export const BudgetInput: React.FC<BudgetInputProps> = ({ value, onChange }) => {
+  const symbol = useCurrencySymbol();
   const formatted = value === 0 ? '' : value.toLocaleString('en-US');
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.currency}>$</Text>
+      <Text style={styles.currency}>{symbol}</Text>
       <TextInput
         value={formatted}
         onChangeText={(text) => onChange(sanitize(text))}

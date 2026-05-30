@@ -3,9 +3,10 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { AppCard, ProgressBar } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { BudgetCategory } from '@/types';
-import { clamp, formatCurrency, formatPercent } from '@/utils/format';
+import { clamp, formatPercent } from '@/utils/format';
 
 interface CategoryCardProps {
   category: BudgetCategory;
@@ -16,6 +17,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
   onPress,
 }) => {
+  const formatMoney = useFormatCurrency();
   const accent = colors.accents[category.accent];
   const remaining = category.budgeted - category.spent;
   const ratio = category.budgeted > 0 ? category.spent / category.budgeted : 0;
@@ -42,8 +44,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
           numberOfLines={1}
         >
           {overBudget
-            ? `${formatCurrency(Math.abs(remaining))} over`
-            : `${formatCurrency(remaining)} left`}
+            ? `${formatMoney(Math.abs(remaining))} over`
+            : `${formatMoney(remaining)} left`}
         </Text>
 
         <View style={styles.progressRow}>

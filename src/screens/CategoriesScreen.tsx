@@ -8,12 +8,13 @@ import { ScreenContainer } from '@/components/ui';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useCategoryEditorStore } from '@/store/categoryEditorStore';
 import { colors, radius, spacing, typography } from '@/theme';
-import { formatCurrency } from '@/utils/format';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 
 export const CategoriesScreen: React.FC = () => {
   const categories = useBudgetStore((s) => s.categories);
   const openCreate = useCategoryEditorStore((s) => s.openCreate);
   const openEdit = useCategoryEditorStore((s) => s.openEdit);
+  const formatMoney = useFormatCurrency();
 
   const totalBudget = categories.reduce((sum, c) => sum + c.budgeted, 0);
   const totalSpent = categories.reduce((sum, c) => sum + c.spent, 0);
@@ -29,7 +30,7 @@ export const CategoriesScreen: React.FC = () => {
               Categories ({categories.length})
             </Text>
             <Text style={styles.subtitle}>
-              {formatCurrency(totalSpent)} of {formatCurrency(totalBudget)}
+              {formatMoney(totalSpent)} of {formatMoney(totalBudget)}
             </Text>
           </View>
 

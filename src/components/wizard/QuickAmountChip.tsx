@@ -1,8 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { colors, radius, spacing, typography } from '@/theme';
-import { formatCurrency } from '@/utils/format';
 
 interface QuickAmountChipProps {
   value: number;
@@ -15,6 +15,7 @@ export const QuickAmountChip: React.FC<QuickAmountChipProps> = ({
   selected,
   onPress,
 }) => {
+  const formatMoney = useFormatCurrency();
   return (
     <Pressable
       onPress={() => onPress(value)}
@@ -25,7 +26,7 @@ export const QuickAmountChip: React.FC<QuickAmountChipProps> = ({
       ]}
     >
       <Text style={[styles.label, selected && styles.labelSelected]}>
-        {formatCurrency(value)}
+        {formatMoney(value)}
       </Text>
     </Pressable>
   );

@@ -2,15 +2,17 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppCard, ProgressBar } from '@/components/ui';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { colors, spacing, typography } from '@/theme';
 import type { MonthlySummary as MonthlySummaryModel } from '@/types';
-import { clamp, formatCurrency, formatPercent } from '@/utils/format';
+import { clamp, formatPercent } from '@/utils/format';
 
 interface MonthlySummaryProps {
   summary: MonthlySummaryModel;
 }
 
 export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ summary }) => {
+  const formatMoney = useFormatCurrency();
   const remaining = summary.budgeted - summary.spent;
   const ratio = summary.budgeted > 0 ? summary.spent / summary.budgeted : 0;
   const isHealthy = ratio < 0.85;
@@ -18,7 +20,7 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ summary }) => {
   return (
     <AppCard style={styles.card}>
       <Text style={styles.eyebrow}>Remaining this month</Text>
-      <Text style={styles.remaining}>{formatCurrency(remaining)}</Text>
+      <Text style={styles.remaining}>{formatMoney(remaining)}</Text>
 
       <View style={styles.progressRow}>
         <ProgressBar
@@ -32,13 +34,13 @@ export const MonthlySummary: React.FC<MonthlySummaryProps> = ({ summary }) => {
       <View style={styles.split}>
         <View style={styles.splitItem}>
           <Text style={styles.splitLabel}>Budgeted</Text>
-          <Text style={styles.splitValue}>{formatCurrency(summary.budgeted)}</Text>
+          <Text style={styles.splitValue}>{formatMoney(summary.budgeted)}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.splitItem}>
           <Text style={styles.splitLabel}>Spent</Text>
           <Text style={[styles.splitValue, styles.spentValue]}>
-            {formatCurrency(summary.spent)}
+            {formatMoney(summary.spent)}
           </Text>
         </View>
       </View>

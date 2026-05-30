@@ -3,12 +3,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 
 import { getCategoryIcon } from '@/data/icons';
+import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useExpenseEditorStore } from '@/store/expenseEditorStore';
 import { useHouseholdStore } from '@/store/householdStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Expense } from '@/types';
-import { formatCurrency } from '@/utils/format';
 
 interface ExpenseRowProps {
   expense: Expense;
@@ -22,6 +22,7 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
     s.users.find((u) => u.id === expense.paidById),
   );
   const openEditor = useExpenseEditorStore((s) => s.open);
+  const formatMoney = useFormatCurrency();
 
   if (!category) return null;
 
@@ -50,7 +51,7 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
       </View>
 
       <View style={styles.right}>
-        <Text style={styles.amount}>{formatCurrency(expense.amount)}</Text>
+        <Text style={styles.amount}>{formatMoney(expense.amount)}</Text>
         {payer && payerAccent ? (
           <View
             style={[

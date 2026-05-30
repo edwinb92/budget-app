@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Trash2, X } from 'lucide-react-native';
 
 import { getCategoryIcon } from '@/data/icons';
+import { useCurrencySymbol } from '@/hooks/useFormatCurrency';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useExpenseEditorStore } from '@/store/expenseEditorStore';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -39,6 +40,7 @@ export const ExpenseEditorSheet: React.FC = () => {
   );
   const updateExpense = useBudgetStore((s) => s.updateExpense);
   const deleteExpense = useBudgetStore((s) => s.deleteExpense);
+  const symbol = useCurrencySymbol();
 
   const [draftAmount, setDraftAmount] = useState('');
   const [draftNote, setDraftNote] = useState('');
@@ -136,16 +138,24 @@ export const ExpenseEditorSheet: React.FC = () => {
             </View>
 
             <Text style={styles.label}>Amount</Text>
-            <TextInput
-              value={draftAmount}
-              onChangeText={setDraftAmount}
-              style={[styles.input, !amountValid && styles.inputInvalid]}
-              selectionColor={colors.primary}
-              keyboardType="decimal-pad"
-              placeholder="0.00"
-              placeholderTextColor={colors.text.faint}
-              autoFocus
-            />
+            <View
+              style={[
+                styles.amountRow,
+                !amountValid && styles.inputInvalid,
+              ]}
+            >
+              <Text style={styles.amountSymbol}>{symbol}</Text>
+              <TextInput
+                value={draftAmount}
+                onChangeText={setDraftAmount}
+                style={styles.amountInput}
+                selectionColor={colors.primary}
+                keyboardType="decimal-pad"
+                placeholder="0.00"
+                placeholderTextColor={colors.text.faint}
+                autoFocus
+              />
+            </View>
 
             <Text style={styles.label}>Description</Text>
             <TextInput
@@ -271,6 +281,28 @@ const styles = StyleSheet.create({
   },
   inputInvalid: {
     borderColor: colors.status.danger,
+  },
+  amountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  amountSymbol: {
+    ...typography.subtitle,
+    color: colors.text.muted,
+  },
+  amountInput: {
+    ...typography.subtitle,
+    color: colors.text.primary,
+    flex: 1,
+    padding: 0,
   },
   hint: {
     ...typography.caption,
