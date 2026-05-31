@@ -14,6 +14,7 @@ export const StepPerson: React.FC = () => {
   const selected = useWizardStore((s) => s.draft.paidById);
   const setPaidById = useWizardStore((s) => s.setPaidById);
   const members = useHouseholdStore(useShallow(selectActiveHouseholdMembers));
+  const currentUserId = useHouseholdStore((s) => s.currentUserId);
 
   return (
     <View style={styles.wrap}>
@@ -24,7 +25,7 @@ export const StepPerson: React.FC = () => {
         {members.map((member) => (
           <View key={member.id} style={styles.cell}>
             <OptionTile
-              label={member.name}
+              label={member.id === currentUserId ? 'You' : member.name}
               accent={member.accent}
               initial={member.initial}
               selected={selected === member.id}

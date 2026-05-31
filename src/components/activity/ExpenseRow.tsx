@@ -21,6 +21,7 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
   const payer = useHouseholdStore((s) =>
     s.users.find((u) => u.id === expense.paidById),
   );
+  const currentUserId = useHouseholdStore((s) => s.currentUserId);
   const openEditor = useExpenseEditorStore((s) => s.open);
   const formatMoney = useFormatCurrency();
 
@@ -28,7 +29,8 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({ expense }) => {
 
   const accent = colors.accents[category.accent];
   const Icon = getCategoryIcon(category.iconKey);
-  const payerAccent = payer ? colors.accents[payer.accent] : null;
+  const isSelf = payer?.id === currentUserId;
+  const payerAccent = payer && !isSelf ? colors.accents[payer.accent] : null;
 
   return (
     <Pressable

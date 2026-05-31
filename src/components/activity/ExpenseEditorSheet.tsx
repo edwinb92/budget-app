@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -17,14 +17,14 @@ import { getCategoryIcon } from '@/data/icons';
 import { useCurrencySymbol } from '@/hooks/useFormatCurrency';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useExpenseEditorStore } from '@/store/expenseEditorStore';
+import { useHouseholdStore } from '@/store/householdStore';
 import { colors, radius, spacing, typography } from '@/theme';
 
-const parseAmount = (raw: string): number | null => {
-  const normalized = raw.replace(',', '.').trim();
-  if (!normalized) return null;
-  const value = Number(normalized);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  return Math.round(value * 100) / 100;
+const sanitize = (input: string): number => {
+  const digits = input.replace(/[^0-9]/g, '');
+  if (!digits) return 0;
+  const parsed = parseInt(digits, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 export const ExpenseEditorSheet: React.FC = () => {
@@ -40,19 +40,21 @@ export const ExpenseEditorSheet: React.FC = () => {
   );
   const updateExpense = useBudgetStore((s) => s.updateExpense);
   const deleteExpense = useBudgetStore((s) => s.deleteExpense);
+  const payer = useHouseholdStore((s) =>
+    expense ? s.users.find((u) => u.id === expense.paidById) : undefined,
+  );
+  const currentUserId = useHouseholdStore((s) => s.currentUserId);
   const symbol = useCurrencySymbol();
 
-  const [draftAmount, setDraftAmount] = useState('');
+  const [draftAmount, setDraftAmount] = useState(0);
   const [draftNote, setDraftNote] = useState('');
 
   useEffect(() => {
     if (expense) {
-      setDraftAmount(String(expense.amount));
+      setDraftAmount(expense.amount);
       setDraftNote(expense.note);
     }
   }, [expense]);
-
-  const parsedAmount = useMemo(() => parseAmount(draftAmount), [draftAmount]);
 
   if (!editingId || !expense || !category) return null;
 
@@ -60,16 +62,17 @@ export const ExpenseEditorSheet: React.FC = () => {
   const Icon = getCategoryIcon(category.iconKey);
 
   const trimmedNote = draftNote.trim();
-  const amountValid = parsedAmount !== null;
+  const amountValid = draftAmount > 0;
+  const formattedAmount = draftAmount === 0 ? '' : draftAmount.toLocaleString('en-US');
   const isDirty =
-    (amountValid && parsedAmount !== expense.amount) ||
+    (amountValid && draftAmount !== expense.amount) ||
     trimmedNote !== expense.note;
   const canSave = amountValid && isDirty;
 
   const handleSave = () => {
     if (!canSave) return;
     updateExpense(expense.id, {
-      amount: parsedAmount ?? expense.amount,
+      amount: draftAmount,
       note: trimmedNote,
     });
     close();
@@ -124,6 +127,19 @@ export const ExpenseEditorSheet: React.FC = () => {
                 <Text style={styles.categoryName} numberOfLines={1}>
                   {category.name}
                 </Text>
+                {payer ? (
+                  <Text style={styles.payerLabel} numberOfLines={1}>
+                    Paid by:{' '}
+                    <Text
+                      style={[
+                        styles.payerName,
+                        { color: colors.accents[payer.accent].base },
+                      ]}
+                    >
+                      {payer.id === currentUserId ? 'You' : payer.name}
+                    </Text>
+                  </Text>
+                ) : null}
               </View>
               <Pressable
                 onPress={close}
@@ -146,27 +162,31 @@ export const ExpenseEditorSheet: React.FC = () => {
             >
               <Text style={styles.amountSymbol}>{symbol}</Text>
               <TextInput
-                value={draftAmount}
-                onChangeText={setDraftAmount}
+                value={formattedAmount}
+                onChangeText={(text) => setDraftAmount(sanitize(text))}
                 style={styles.amountInput}
                 selectionColor={colors.primary}
-                keyboardType="decimal-pad"
-                placeholder="0.00"
+                keyboardType="number-pad"
+                placeholder="0"
                 placeholderTextColor={colors.text.faint}
+                maxLength={11}
                 autoFocus
               />
             </View>
 
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>What was this for?</Text>
             <TextInput
               value={draftNote}
               onChangeText={setDraftNote}
-              style={styles.input}
+              style={styles.noteInput}
               selectionColor={colors.primary}
-              placeholder="What was this for?"
+              placeholder="e.g. Pizza with friends"
               placeholderTextColor={colors.text.faint}
-              maxLength={80}
+              multiline
+              maxLength={140}
+              textAlignVertical="top"
             />
+            <Text style={styles.noteCounter}>{draftNote.length}/140</Text>
 
             <Text style={styles.hint}>
               Need to change the category? Delete this expense and add it again.
@@ -250,6 +270,14 @@ const styles = StyleSheet.create({
     ...typography.title,
     color: colors.text.primary,
   },
+  payerLabel: {
+    ...typography.caption,
+    color: colors.text.muted,
+    marginTop: 6,
+  },
+  payerName: {
+    fontWeight: '700',
+  },
   iconBtn: {
     width: 36,
     height: 36,
@@ -268,19 +296,26 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
     marginBottom: spacing.sm,
   },
-  input: {
-    ...typography.subtitle,
+  inputInvalid: {
+    borderColor: colors.status.danger,
+  },
+  noteInput: {
+    ...typography.body,
     color: colors.text.primary,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    marginBottom: spacing.lg,
+    padding: spacing.lg,
+    minHeight: 120,
+    textAlignVertical: 'top',
   },
-  inputInvalid: {
-    borderColor: colors.status.danger,
+  noteCounter: {
+    ...typography.caption,
+    color: colors.text.faint,
+    textAlign: 'right',
+    marginTop: spacing.sm,
+    marginBottom: spacing.lg,
   },
   amountRow: {
     flexDirection: 'row',
