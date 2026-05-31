@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { CATEGORY_ICONS, ICON_KEYS } from '@/data/icons';
 import { AccentName, colors, radius, spacing } from '@/theme';
@@ -18,7 +18,12 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   const accentColor = colors.accents[accent];
 
   return (
-    <View style={styles.grid}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.grid}
+      showsVerticalScrollIndicator
+      nestedScrollEnabled
+    >
       {ICON_KEYS.map((key) => {
         const Icon = CATEGORY_ICONS[key]!;
         const selected = key === value;
@@ -44,15 +49,20 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scroll: {
+    maxHeight: 240,
+    borderRadius: radius.md,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+    paddingBottom: spacing.xs,
   },
   tile: {
     width: 48,

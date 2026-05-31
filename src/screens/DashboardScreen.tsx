@@ -76,22 +76,13 @@ export const DashboardScreen: React.FC = () => {
               message={t('dashboard.categoriesEmpty')}
             />
           ) : (
-            <View style={styles.grid}>
-              {categories.map((category, index) => (
-                <View
-                  key={category.id}
-                  style={[
-                    styles.gridItem,
-                    index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight,
-                  ]}
-                >
-                  <CategoryCard
-                    category={category}
-                    onPress={handleCategoryPress}
-                  />
-                </View>
-              ))}
-            </View>
+            categories.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                onPress={handleCategoryPress}
+              />
+            ))
           )}
         </View>
 
@@ -109,8 +100,6 @@ export const DashboardScreen: React.FC = () => {
     </ScreenContainer>
   );
 };
-
-const GRID_GUTTER = spacing.md;
 
 const styles = StyleSheet.create({
   header: {
@@ -142,18 +131,6 @@ const styles = StyleSheet.create({
   section: {
     marginTop: spacing.xl,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -GRID_GUTTER / 2,
-  },
-  gridItem: {
-    width: '50%',
-    paddingHorizontal: GRID_GUTTER / 2,
-    marginBottom: GRID_GUTTER,
-  },
-  gridItemLeft: {},
-  gridItemRight: {},
   empty: {
     alignItems: 'center',
     justifyContent: 'center',

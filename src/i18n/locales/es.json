@@ -68,8 +68,6 @@
     "titleWithCount": "Categorías ({{count}})",
     "new": "Nueva",
     "spentOf": "{{spent}} de {{total}}",
-    "remainingAmount": "Quedan {{amount}}",
-    "overBudget": "{{amount}} pasado",
     "editor": {
       "newTitle": "Nueva categoría",
       "editTitle": "Editar categoría",

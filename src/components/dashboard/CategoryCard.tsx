@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppCard, ProgressBar } from '@/components/ui';
+import { ProgressBar } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
 import { useFormatCurrency } from '@/hooks/useFormatCurrency';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, shadows, spacing, typography } from '@/theme';
 import type { BudgetCategory } from '@/types';
 import { clamp, formatPercent } from '@/utils/format';
 
@@ -21,37 +21,41 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   const { t } = useTranslation();
   const formatMoney = useFormatCurrency();
   const accent = colors.accents[category.accent];
+  const Icon = getCategoryIcon(category.iconKey);
   const remaining = category.budgeted - category.spent;
   const ratio = category.budgeted > 0 ? category.spent / category.budgeted : 0;
   const overBudget = remaining < 0;
-  const Icon = getCategoryIcon(category.iconKey);
+  const isExact = remaining === 0;
+  const remainingStyle = overBudget
+    ? styles.overBudget
+    : isExact
+      ? styles.zero
+      : styles.available;
 
   return (
-    <AppCard
+    <Pressable
       onPress={onPress ? () => onPress(category) : undefined}
-      style={styles.card}
-      padded={false}
+      style={({ pressed }) => [
+        styles.row,
+        shadows.card,
+        pressed && styles.pressed,
+      ]}
     >
-      <View style={styles.inner}>
-        <View style={[styles.iconWrap, { backgroundColor: accent.soft }]}>
-          <Icon size={20} color={accent.base} strokeWidth={2.2} />
-        </View>
+      <View style={[styles.iconWrap, { backgroundColor: accent.soft }]}>
+        <Icon size={22} color={accent.base} strokeWidth={2.2} />
+      </View>
 
+      <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
           {category.name}
         </Text>
-
         <Text
-          style={[styles.remaining, overBudget && styles.overBudget]}
+          style={[styles.remaining, remainingStyle]}
           numberOfLines={1}
         >
           {overBudget
-            ? t('categories.overBudget', {
-                amount: formatMoney(Math.abs(remaining)),
-              })
-            : t('categories.remainingAmount', {
-                amount: formatMoney(remaining),
-              })}
+            ? `(${formatMoney(Math.abs(remaining))})`
+            : formatMoney(remaining)}
         </Text>
 
         <View style={styles.progressRow}>
@@ -65,35 +69,56 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
           </View>
           <Text style={styles.percent}>{formatPercent(ratio)}</Text>
         </View>
+
+        <Text style={styles.budget}>
+          {t('categories.spentOf', {
+            spent: formatMoney(category.spent),
+            total: formatMoney(category.budgeted),
+          })}
+        </Text>
       </View>
-    </AppCard>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    flex: 1,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    gap: spacing.md,
+    marginBottom: spacing.sm,
   },
-  inner: {
-    padding: spacing.lg,
+  pressed: {
+    opacity: 0.92,
+    transform: [{ scale: 0.995 }],
   },
   iconWrap: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+  },
+  info: {
+    flex: 1,
+    gap: 6,
   },
   name: {
-    ...typography.caption,
-    color: colors.text.muted,
-    marginBottom: 2,
-  },
-  remaining: {
     ...typography.subtitle,
     color: colors.text.primary,
-    marginBottom: spacing.md,
+  },
+  remaining: {
+    ...typography.caption,
+    fontWeight: '700',
+  },
+  available: {
+    color: colors.status.success,
+  },
+  zero: {
+    color: colors.text.muted,
   },
   overBudget: {
     color: colors.status.danger,
@@ -112,5 +137,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     minWidth: 32,
     textAlign: 'right',
+  },
+  budget: {
+    ...typography.caption,
+    color: colors.text.faint,
   },
 });

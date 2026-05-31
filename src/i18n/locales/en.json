@@ -68,8 +68,6 @@
     "titleWithCount": "Categories ({{count}})",
     "new": "New",
     "spentOf": "{{spent}} of {{total}}",
-    "remainingAmount": "{{amount}} left",
-    "overBudget": "{{amount}} over",
     "editor": {
       "newTitle": "New category",
       "editTitle": "Edit category",

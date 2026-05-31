@@ -26,6 +26,12 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
   const remaining = category.budgeted - category.spent;
   const ratio = category.budgeted > 0 ? category.spent / category.budgeted : 0;
   const overBudget = remaining < 0;
+  const isExact = remaining === 0;
+  const remainingStyle = overBudget
+    ? styles.overBudget
+    : isExact
+      ? styles.zero
+      : styles.available;
 
   return (
     <Pressable
@@ -41,23 +47,17 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
       </View>
 
       <View style={styles.info}>
-        <View style={styles.topRow}>
-          <Text style={styles.name} numberOfLines={1}>
-            {category.name}
-          </Text>
-          <Text
-            style={[styles.remaining, overBudget && styles.overBudget]}
-            numberOfLines={1}
-          >
-            {overBudget
-              ? t('categories.overBudget', {
-                  amount: formatMoney(Math.abs(remaining)),
-                })
-              : t('categories.remainingAmount', {
-                  amount: formatMoney(remaining),
-                })}
-          </Text>
-        </View>
+        <Text style={styles.name} numberOfLines={1}>
+          {category.name}
+        </Text>
+        <Text
+          style={[styles.remaining, remainingStyle]}
+          numberOfLines={1}
+        >
+          {overBudget
+            ? `(${formatMoney(Math.abs(remaining))})`
+            : formatMoney(remaining)}
+        </Text>
 
         <View style={styles.progressRow}>
           <View style={styles.progressFlex}>
@@ -109,21 +109,19 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 6,
   },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
   name: {
     ...typography.subtitle,
     color: colors.text.primary,
-    flex: 1,
   },
   remaining: {
     ...typography.caption,
-    color: colors.text.muted,
     fontWeight: '700',
-    marginLeft: spacing.sm,
+  },
+  available: {
+    color: colors.status.success,
+  },
+  zero: {
+    color: colors.text.muted,
   },
   overBudget: {
     color: colors.status.danger,
