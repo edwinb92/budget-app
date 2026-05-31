@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Check } from 'lucide-react-native';
 
 import { PrimaryButton } from '@/components/ui';
@@ -18,10 +19,11 @@ export const WizardFooter: React.FC<WizardFooterProps> = ({
   onNext,
   onSave,
 }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.wrap}>
       <PrimaryButton
-        label={isLast ? 'Save expense' : 'Next'}
+        label={isLast ? t('wizard.save') : t('wizard.next')}
         icon={isLast ? Check : ArrowRight}
         onPress={isLast ? onSave : onNext}
         disabled={!canAdvance}

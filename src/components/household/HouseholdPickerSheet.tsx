@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check, Plus, Settings2, User, Users } from 'lucide-react-native';
 
@@ -18,6 +19,7 @@ import {
 import { colors, radius, spacing, typography } from '@/theme';
 
 export const HouseholdPickerSheet: React.FC = () => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const isOpen = useHouseholdEditorStore((s) => s.pickerOpen);
   const close = useHouseholdEditorStore((s) => s.closePicker);
@@ -46,10 +48,8 @@ export const HouseholdPickerSheet: React.FC = () => {
         >
           <View style={styles.handle} />
 
-          <Text style={styles.title}>Shared budgets</Text>
-          <Text style={styles.subtitle}>
-            Switch between your shared budgets.
-          </Text>
+          <Text style={styles.title}>{t('household.sharedBudgets')}</Text>
+          <Text style={styles.subtitle}>{t('household.pickerSubtitle')}</Text>
 
           <ScrollView
             style={styles.list}
@@ -91,7 +91,7 @@ export const HouseholdPickerSheet: React.FC = () => {
                   <View style={styles.rowText}>
                     <Text style={styles.rowName}>{h.name}</Text>
                     <Text style={styles.rowMeta}>
-                      {memberCount} {memberCount === 1 ? 'member' : 'members'}
+                      {t('household.members', { count: memberCount })}
                       {' · '}
                       {h.currency}
                     </Text>
@@ -114,7 +114,9 @@ export const HouseholdPickerSheet: React.FC = () => {
               ]}
             >
               <Plus size={18} color={colors.onPrimary} strokeWidth={2.6} />
-              <Text style={styles.actionPrimaryLabel}>Create new budget</Text>
+              <Text style={styles.actionPrimaryLabel}>
+                {t('household.createNew')}
+              </Text>
             </Pressable>
 
             <Pressable
@@ -126,7 +128,9 @@ export const HouseholdPickerSheet: React.FC = () => {
               ]}
             >
               <Settings2 size={18} color={colors.primary} strokeWidth={2.4} />
-              <Text style={styles.actionGhostLabel}>Manage current budget</Text>
+              <Text style={styles.actionGhostLabel}>
+                {t('household.manageCurrent')}
+              </Text>
             </Pressable>
           </View>
         </Pressable>

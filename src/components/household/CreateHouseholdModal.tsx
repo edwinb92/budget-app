@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 
@@ -21,6 +22,7 @@ import { colors, radius, spacing, typography } from '@/theme';
 import type { CurrencyCode } from '@/types';
 
 export const CreateHouseholdModal: React.FC = () => {
+  const { t } = useTranslation();
   const isOpen = useHouseholdEditorStore((s) => s.createOpen);
   const close = useHouseholdEditorStore((s) => s.closeCreate);
   const createHousehold = useHouseholdStore((s) => s.createHousehold);
@@ -56,7 +58,7 @@ export const CreateHouseholdModal: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <View style={styles.header}>
-            <Text style={styles.title}>New budget</Text>
+            <Text style={styles.title}>{t('household.newBudget')}</Text>
             <Pressable
               onPress={close}
               hitSlop={12}
@@ -72,17 +74,14 @@ export const CreateHouseholdModal: React.FC = () => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.intro}>
-              Create a shared budget to track expenses with someone — like
-              your home, a trip, or a special event.
-            </Text>
+            <Text style={styles.intro}>{t('household.createIntro')}</Text>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Name</Text>
+              <Text style={styles.sectionLabel}>{t('household.nameLabel')}</Text>
               <TextInput
                 value={name}
                 onChangeText={setName}
-                placeholder="e.g. Casa Principal"
+                placeholder={t('household.namePlaceholder')}
                 placeholderTextColor={colors.text.faint}
                 style={styles.nameInput}
                 autoFocus
@@ -92,17 +91,15 @@ export const CreateHouseholdModal: React.FC = () => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Currency</Text>
+              <Text style={styles.sectionLabel}>{t('household.currencyLabel')}</Text>
               <CurrencyPicker value={currency} onChange={setCurrency} />
-              <Text style={styles.hint}>
-                You can change this later from budget settings.
-              </Text>
+              <Text style={styles.hint}>{t('household.currencyHint')}</Text>
             </View>
           </ScrollView>
 
           <View style={styles.footer}>
             <PrimaryButton
-              label="Create budget"
+              label={t('household.createBudget')}
               onPress={handleCreate}
               disabled={!canCreate}
             />

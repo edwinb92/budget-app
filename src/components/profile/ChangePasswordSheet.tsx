@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { KeyRound, X } from 'lucide-react-native';
 
 import { supabase } from '@/lib/supabase';
@@ -22,6 +23,7 @@ export const ChangePasswordSheet: React.FC = () => {
   const isOpen = useProfileEditorStore((s) => s.passwordOpen);
   const close = useProfileEditorStore((s) => s.closePassword);
 
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +55,7 @@ export const ChangePasswordSheet: React.FC = () => {
     }
 
     close();
-    Alert.alert('Password updated', 'Your password has been changed.');
+    Alert.alert(t('password.updatedTitle'), t('password.updatedBody'));
   };
 
   return (
@@ -83,8 +85,8 @@ export const ChangePasswordSheet: React.FC = () => {
                 <KeyRound size={20} color={colors.onPrimary} strokeWidth={2.4} />
               </View>
               <View style={styles.headerText}>
-                <Text style={styles.eyebrow}>Security</Text>
-                <Text style={styles.title}>Change password</Text>
+                <Text style={styles.eyebrow}>{t('password.eyebrow')}</Text>
+                <Text style={styles.title}>{t('password.title')}</Text>
               </View>
               <Pressable
                 onPress={close}
@@ -98,13 +100,13 @@ export const ChangePasswordSheet: React.FC = () => {
               </Pressable>
             </View>
 
-            <Text style={styles.label}>New password</Text>
+            <Text style={styles.label}>{t('password.newLabel')}</Text>
             <TextInput
               value={password}
               onChangeText={setPassword}
               style={styles.input}
               selectionColor={colors.primary}
-              placeholder="At least 6 characters"
+              placeholder={t('password.newPlaceholder')}
               placeholderTextColor={colors.text.faint}
               secureTextEntry
               autoCapitalize="none"
@@ -112,13 +114,13 @@ export const ChangePasswordSheet: React.FC = () => {
               autoFocus
             />
 
-            <Text style={styles.label}>Confirm new password</Text>
+            <Text style={styles.label}>{t('password.confirmLabel')}</Text>
             <TextInput
               value={confirm}
               onChangeText={setConfirm}
               style={styles.input}
               selectionColor={colors.primary}
-              placeholder="Repeat the password"
+              placeholder={t('password.confirmPlaceholder')}
               placeholderTextColor={colors.text.faint}
               secureTextEntry
               autoCapitalize="none"
@@ -128,12 +130,10 @@ export const ChangePasswordSheet: React.FC = () => {
             />
 
             {!longEnough && password.length > 0 ? (
-              <Text style={styles.warning}>
-                Password must be at least 6 characters.
-              </Text>
+              <Text style={styles.warning}>{t('password.tooShort')}</Text>
             ) : null}
             {longEnough && confirm.length > 0 && !matches ? (
-              <Text style={styles.warning}>Passwords don&apos;t match.</Text>
+              <Text style={styles.warning}>{t('password.noMatch')}</Text>
             ) : null}
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -147,7 +147,7 @@ export const ChangePasswordSheet: React.FC = () => {
               ]}
             >
               <Text style={styles.submitLabel}>
-                {submitting ? 'Updating...' : 'Update password'}
+                {submitting ? t('password.updating') : t('password.updateButton')}
               </Text>
             </Pressable>
           </Pressable>

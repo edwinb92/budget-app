@@ -1,19 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Receipt } from 'lucide-react-native';
 
 import { colors, radius, spacing, typography } from '@/theme';
 
 export const ActivityEmptyState: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.wrap}>
       <View style={styles.iconWrap}>
         <Receipt size={32} color={colors.primary} strokeWidth={2.2} />
       </View>
-      <Text style={styles.title}>No expenses yet</Text>
-      <Text style={styles.subtitle}>
-        Tap the + button to add your first expense.
-      </Text>
+      <Text style={styles.title}>{t('activity.emptyTitle')}</Text>
+      <Text style={styles.subtitle}>{t('activity.emptySubtitle')}</Text>
     </View>
   );
 };

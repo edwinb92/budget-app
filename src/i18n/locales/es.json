@@ -1,0 +1,213 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "edit": "Editar",
+    "remove": "Quitar",
+    "send": "Enviar",
+    "saving": "Guardando...",
+    "you": "Vos"
+  },
+  "tabs": {
+    "dashboard": "Inicio",
+    "activity": "Actividad",
+    "categories": "Categorías",
+    "settings": "Ajustes"
+  },
+  "auth": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "createAccount": "Crear cuenta",
+    "signInSubtitle": "Ingresá a tus presupuestos compartidos.",
+    "signUpSubtitle": "Empezá a llevar tus presupuestos compartidos.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Mínimo 6 caracteres",
+    "signInButton": "Ingresar",
+    "signUpButton": "Crear cuenta",
+    "toggleToSignUp": "¿No tenés cuenta? ",
+    "toggleToSignIn": "¿Ya tenés cuenta? ",
+    "signUp": "Registrate",
+    "signIn": "Ingresá"
+  },
+  "dashboard": {
+    "greeting": "Hola, {{name}}",
+    "greetingFallback": "Hola",
+    "categoriesSection": "Categorías",
+    "billsSection": "Cuentas",
+    "seeAll": "Ver todo",
+    "manage": "Gestionar",
+    "categoriesEmpty": "Aún no hay categorías. Creá una para empezar a presupuestar.",
+    "billsEmpty": "Aún no hay cuentas. Tus pagos recurrentes van a aparecer acá."
+  },
+  "summary": {
+    "remainingThisMonth": "Disponible este mes",
+    "budgeted": "Presupuestado",
+    "spent": "Gastado"
+  },
+  "activity": {
+    "title": "Actividad",
+    "titleWithCount": "Actividad ({{count}})",
+    "filteredTitle": "Actividad filtrada",
+    "filteringBy": "Filtrando por",
+    "nothingYet": "Todavía no hay nada acá.",
+    "emptyTitle": "Aún no hay gastos",
+    "emptySubtitle": "Tocá el botón + para agregar tu primer gasto.",
+    "emptyFiltered": "Aún no hay gastos en esta categoría.",
+    "expensesCount_one": "{{count}} gasto",
+    "expensesCount_other": "{{count}} gastos",
+    "today": "Hoy",
+    "yesterday": "Ayer"
+  },
+  "categories": {
+    "title": "Categorías",
+    "titleWithCount": "Categorías ({{count}})",
+    "new": "Nueva",
+    "spentOf": "{{spent}} de {{total}}",
+    "remainingAmount": "Quedan {{amount}}",
+    "overBudget": "{{amount}} pasado",
+    "editor": {
+      "newTitle": "Nueva categoría",
+      "editTitle": "Editar categoría",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej. Supermercado",
+      "budgetLabel": "Presupuesto mensual",
+      "iconLabel": "Ícono",
+      "colorLabel": "Color",
+      "deleteButton": "Eliminar categoría",
+      "saveButton": "Guardar cambios",
+      "createButton": "Crear categoría"
+    }
+  },
+  "expense": {
+    "editTitle": "Editar gasto",
+    "amount": "Monto",
+    "description": "¿Para qué fue?",
+    "descriptionPlaceholder": "ej. Pizza con amigos",
+    "paidBy": "Pagado por: ",
+    "saveChanges": "Guardar cambios",
+    "deleteButton": "Eliminar gasto",
+    "deleteAlertTitle": "Eliminar gasto",
+    "deleteAlertBody": "¿Eliminar este gasto de {{category}}? Se va a actualizar tu categoría y los totales del mes.",
+    "changeCategoryHint": "¿Necesitás cambiar la categoría? Eliminá el gasto y agregalo de nuevo."
+  },
+  "wizard": {
+    "newExpense": "Nuevo gasto",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "save": "Guardar gasto",
+    "stepOf": "Paso {{current}} de {{total}}",
+    "stepCategoryTitle": "¿Qué categoría?",
+    "stepCategorySubtitle": "Elegí a qué categoría pertenece este gasto.",
+    "stepAmountTitle": "¿Cuánto?",
+    "stepAmountSubtitle": "Escribí el monto o tocá un atajo.",
+    "stepNoteTitle": "¿Alguna nota?",
+    "stepNoteSubtitle": "Opcional — saltala si no necesitás.",
+    "stepNotePlaceholder": "ej. Pizza con amigos",
+    "stepPersonTitle": "¿Quién pagó?",
+    "stepPersonSubtitle": "Así lo dividimos justo más adelante."
+  },
+  "household": {
+    "activeBudget": "Presupuesto activo",
+    "members_one": "{{count}} miembro",
+    "members_other": "{{count}} miembros",
+    "newBudget": "Nuevo presupuesto",
+    "createIntro": "Creá un presupuesto compartido para registrar gastos con alguien — tu casa, un viaje, un evento especial.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "ej. Casa Principal",
+    "currencyLabel": "Moneda",
+    "currencyHint": "Podés cambiarla después desde los ajustes del presupuesto.",
+    "nameOwnerHint": "Solo el dueño puede renombrar este presupuesto.",
+    "createBudget": "Crear presupuesto",
+    "manageBudget": "Gestionar presupuesto",
+    "membersSection": "Miembros ({{count}})",
+    "invite": "Invitar",
+    "dangerZone": "Zona peligrosa",
+    "leaveBudget": "Salir del presupuesto",
+    "deleteBudget": "Eliminar presupuesto",
+    "sharedBudgets": "Presupuestos compartidos",
+    "pickerSubtitle": "Cambiá entre tus presupuestos compartidos.",
+    "createNew": "Crear nuevo presupuesto",
+    "manageCurrent": "Gestionar este presupuesto"
+  },
+  "member": {
+    "you": " (vos)",
+    "owner": "Dueño",
+    "editMember": "Editar miembro",
+    "removeMember": "Quitar miembro",
+    "editTitle": "Editar miembro",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Nombre del miembro",
+    "saveChanges": "Guardar cambios",
+    "removeAlertTitle": "Quitar miembro",
+    "removeAlertBody": "¿Quitar a {{name}} de {{household}}? No va a tener más acceso a este presupuesto."
+  },
+  "invite": {
+    "title": "Invitar al presupuesto",
+    "subtitle": "Le mandamos un email con un link para unirse.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "sendButton": "Enviar invitación",
+    "sentTitle": "Invitación enviada",
+    "sentBody": "Le mandamos una invitación a {{email}}. Va a aparecer acá cuando la acepte."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Gestioná tus presupuestos compartidos y preferencias.",
+    "sharedBudgetsTitle": "Presupuestos compartidos",
+    "sharedBudgetsDescription": "Cambiá, creá o gestioná tus presupuestos compartidos.",
+    "createNewBudget": "Crear nuevo presupuesto",
+    "preferencesTitle": "Preferencias",
+    "notifications": "Notificaciones",
+    "notificationsOn": "Activadas",
+    "languageRow": "Idioma",
+    "accountTitle": "Cuenta",
+    "profile": "Perfil",
+    "changePassword": "Cambiar contraseña",
+    "logOut": "Cerrar sesión"
+  },
+  "profile": {
+    "editorEyebrow": "Editar perfil",
+    "editorTitle": "Tus datos",
+    "preview": "Vista previa",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "accentLabel": "Color de acento",
+    "emailLabel": "Email",
+    "emailReadonly": "El email no se puede cambiar por ahora.",
+    "saveChanges": "Guardar cambios",
+    "saving": "Guardando..."
+  },
+  "password": {
+    "eyebrow": "Seguridad",
+    "title": "Cambiar contraseña",
+    "newLabel": "Nueva contraseña",
+    "newPlaceholder": "Mínimo 6 caracteres",
+    "confirmLabel": "Confirmar nueva contraseña",
+    "confirmPlaceholder": "Repetí la contraseña",
+    "tooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "noMatch": "Las contraseñas no coinciden.",
+    "updateButton": "Actualizar contraseña",
+    "updating": "Actualizando...",
+    "updatedTitle": "Contraseña actualizada",
+    "updatedBody": "Tu contraseña fue cambiada."
+  },
+  "bills": {
+    "dueDay": "Vence día {{day}}",
+    "paid": "Pagada",
+    "pending": "Pendiente"
+  },
+  "mutation": {
+    "saving": "Guardando..."
+  },
+  "language": {
+    "title": "Idioma",
+    "subtitle": "Elegí el idioma en el que querés usar la app.",
+    "english": "Inglés",
+    "spanish": "Español"
+  }
+}

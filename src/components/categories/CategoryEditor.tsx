@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trash2, X } from 'lucide-react-native';
 
@@ -24,6 +25,7 @@ import {
 import { colors, radius, spacing, typography } from '@/theme';
 
 export const CategoryEditor: React.FC = () => {
+  const { t } = useTranslation();
   const mode = useCategoryEditorStore((s) => s.mode);
   const draft = useCategoryEditorStore((s) => s.draft);
   const canSave = useCategoryEditorStore(selectCanSave);
@@ -52,7 +54,7 @@ export const CategoryEditor: React.FC = () => {
         >
           <View style={styles.header}>
             <Text style={styles.title}>
-              {isEdit ? 'Edit category' : 'New category'}
+              {isEdit ? t('categories.editor.editTitle') : t('categories.editor.newTitle')}
             </Text>
             <Pressable
               onPress={close}
@@ -70,11 +72,11 @@ export const CategoryEditor: React.FC = () => {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Name</Text>
+              <Text style={styles.sectionLabel}>{t('categories.editor.nameLabel')}</Text>
               <TextInput
                 value={draft.name}
                 onChangeText={setName}
-                placeholder="e.g. Groceries"
+                placeholder={t('categories.editor.namePlaceholder')}
                 placeholderTextColor={colors.text.faint}
                 style={styles.nameInput}
                 autoFocus={!isEdit}
@@ -84,12 +86,12 @@ export const CategoryEditor: React.FC = () => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Color</Text>
+              <Text style={styles.sectionLabel}>{t('categories.editor.colorLabel')}</Text>
               <AccentPicker value={draft.accent} onChange={setAccent} />
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Icon</Text>
+              <Text style={styles.sectionLabel}>{t('categories.editor.iconLabel')}</Text>
               <IconPicker
                 value={draft.iconKey}
                 accent={draft.accent}
@@ -98,7 +100,7 @@ export const CategoryEditor: React.FC = () => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Monthly budget</Text>
+              <Text style={styles.sectionLabel}>{t('categories.editor.budgetLabel')}</Text>
               <BudgetInput value={draft.budgeted} onChange={setBudgeted} />
             </View>
 
@@ -111,14 +113,14 @@ export const CategoryEditor: React.FC = () => {
                 ]}
               >
                 <Trash2 size={18} color={colors.status.danger} strokeWidth={2.2} />
-                <Text style={styles.deleteLabel}>Delete category</Text>
+                <Text style={styles.deleteLabel}>{t('categories.editor.deleteButton')}</Text>
               </Pressable>
             ) : null}
           </ScrollView>
 
           <View style={styles.footer}>
             <PrimaryButton
-              label={isEdit ? 'Save changes' : 'Create category'}
+              label={isEdit ? t('categories.editor.saveButton') : t('categories.editor.createButton')}
               onPress={save}
               disabled={!canSave}
             />

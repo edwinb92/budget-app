@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 const startOfDay = (ts: number): number => {
@@ -9,16 +11,20 @@ const startOfDay = (ts: number): number => {
 const daysBetween = (a: number, b: number): number =>
   Math.round((startOfDay(b) - startOfDay(a)) / MS_PER_DAY);
 
+const localeForDates = (): string =>
+  i18n.language === 'es' ? 'es-CR' : 'en-US';
+
 export const formatDayLabel = (ts: number, now: number = Date.now()): string => {
   const diff = daysBetween(ts, now);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Yesterday';
+  if (diff === 0) return i18n.t('activity.today');
+  if (diff === 1) return i18n.t('activity.yesterday');
+  const locale = localeForDates();
   if (diff > 1 && diff < 7) {
-    return new Date(ts).toLocaleDateString('en-US', {
+    return new Date(ts).toLocaleDateString(locale, {
       weekday: 'long',
     });
   }
-  return new Date(ts).toLocaleDateString('en-US', {
+  return new Date(ts).toLocaleDateString(locale, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',

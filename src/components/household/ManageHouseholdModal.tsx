@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LogOut, Plus, Trash2, X } from 'lucide-react-native';
 
@@ -27,6 +28,7 @@ import { colors, radius, spacing, typography } from '@/theme';
 import type { CurrencyCode, Membership, User } from '@/types';
 
 export const ManageHouseholdModal: React.FC = () => {
+  const { t } = useTranslation();
   const householdId = useHouseholdEditorStore((s) => s.manageOpenForId);
   const close = useHouseholdEditorStore((s) => s.closeManage);
 
@@ -95,12 +97,15 @@ export const ManageHouseholdModal: React.FC = () => {
 
   const confirmRemoveMember = (member: User) => {
     Alert.alert(
-      'Remove member',
-      `Remove ${member.name} from ${household.name}? They won't have access to this budget anymore.`,
+      t('member.removeAlertTitle'),
+      t('member.removeAlertBody', {
+        name: member.name,
+        household: household.name,
+      }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Remove',
+          text: t('member.removeMember'),
           style: 'destructive',
           onPress: () => removeUserFromHousehold(householdId, member.id),
         },
@@ -139,7 +144,7 @@ export const ManageHouseholdModal: React.FC = () => {
         >
           <View style={styles.header}>
             <View style={styles.headerText}>
-              <Text style={styles.eyebrow}>Manage budget</Text>
+              <Text style={styles.eyebrow}>{t('household.manageBudget')}</Text>
               <Text style={styles.title} numberOfLines={1}>
                 {household.name}
               </Text>
@@ -162,7 +167,7 @@ export const ManageHouseholdModal: React.FC = () => {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionLabel}>
-                  Members ({members.length})
+                  {t('household.membersSection', { count: members.length })}
                 </Text>
                 <Pressable
                   style={({ pressed }) => [
@@ -172,7 +177,7 @@ export const ManageHouseholdModal: React.FC = () => {
                   onPress={() => setInviteOpen(true)}
                 >
                   <Plus size={14} color={colors.primary} strokeWidth={2.6} />
-                  <Text style={styles.inviteLabel}>Invite</Text>
+                  <Text style={styles.inviteLabel}>{t('household.invite')}</Text>
                 </Pressable>
               </View>
 
@@ -189,7 +194,7 @@ export const ManageHouseholdModal: React.FC = () => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Name</Text>
+              <Text style={styles.sectionLabel}>{t('household.nameLabel')}</Text>
               <View style={styles.nameRow}>
                 <TextInput
                   value={draftName}
@@ -207,19 +212,19 @@ export const ManageHouseholdModal: React.FC = () => {
                       pressed && styles.pressed,
                     ]}
                   >
-                    <Text style={styles.saveNameLabel}>Save</Text>
+                    <Text style={styles.saveNameLabel}>{t('common.save')}</Text>
                   </Pressable>
                 ) : null}
               </View>
               {!isOwner ? (
                 <Text style={styles.hint}>
-                  Only the owner can rename this budget.
+                  {t('household.nameOwnerHint')}
                 </Text>
               ) : null}
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Currency</Text>
+              <Text style={styles.sectionLabel}>{t('household.currencyLabel')}</Text>
               <CurrencyPicker
                 value={household.currency}
                 onChange={handleSetCurrency}
@@ -227,7 +232,7 @@ export const ManageHouseholdModal: React.FC = () => {
             </View>
 
             <View style={styles.dangerZone}>
-              <Text style={styles.dangerLabel}>Danger zone</Text>
+              <Text style={styles.dangerLabel}>{t('household.dangerZone')}</Text>
 
               {!isOwner ? (
                 <Pressable
@@ -242,7 +247,7 @@ export const ManageHouseholdModal: React.FC = () => {
                     color={colors.status.danger}
                     strokeWidth={2.2}
                   />
-                  <Text style={styles.dangerBtnLabel}>Leave budget</Text>
+                  <Text style={styles.dangerBtnLabel}>{t('household.leaveBudget')}</Text>
                 </Pressable>
               ) : null}
 
@@ -259,7 +264,7 @@ export const ManageHouseholdModal: React.FC = () => {
                     color={colors.status.danger}
                     strokeWidth={2.2}
                   />
-                  <Text style={styles.dangerBtnLabel}>Delete budget</Text>
+                  <Text style={styles.dangerBtnLabel}>{t('household.deleteBudget')}</Text>
                 </Pressable>
               ) : null}
             </View>

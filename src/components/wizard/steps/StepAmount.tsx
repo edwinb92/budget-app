@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AmountDisplay } from '@/components/wizard/AmountDisplay';
 import { QuickAmountChip } from '@/components/wizard/QuickAmountChip';
@@ -9,13 +10,14 @@ import { colors, spacing, typography } from '@/theme';
 const QUICK_AMOUNTS = [10, 50, 100, 200];
 
 export const StepAmount: React.FC = () => {
+  const { t } = useTranslation();
   const amount = useWizardStore((s) => s.draft.amount);
   const setAmount = useWizardStore((s) => s.setAmount);
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>How much?</Text>
-      <Text style={styles.subtitle}>Type the amount or tap a quick pick.</Text>
+      <Text style={styles.title}>{t('wizard.stepAmountTitle')}</Text>
+      <Text style={styles.subtitle}>{t('wizard.stepAmountSubtitle')}</Text>
 
       <AmountDisplay value={amount} onChange={setAmount} />
 

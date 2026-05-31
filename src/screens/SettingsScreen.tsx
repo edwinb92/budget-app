@@ -1,7 +1,9 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import {
   Bell,
+  Globe,
   KeyRound,
   LogOut,
   Plus,
@@ -22,6 +24,7 @@ import {
 import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 export const SettingsScreen: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const households = useHouseholdStore((s) => s.households);
   const activeHousehold = useHouseholdStore(selectActiveHousehold);
   const currentUser = useHouseholdStore(selectCurrentUser);
@@ -31,15 +34,17 @@ export const SettingsScreen: React.FC = () => {
   const openManage = useHouseholdEditorStore((s) => s.openManage);
   const openProfile = useProfileEditorStore((s) => s.openProfile);
   const openPassword = useProfileEditorStore((s) => s.openPassword);
+  const openLanguage = useProfileEditorStore((s) => s.openLanguage);
   const signOut = useAuthStore((s) => s.signOut);
+
+  const currentLangLabel =
+    i18n.language === 'es' ? t('language.spanish') : t('language.english');
 
   return (
     <ScreenContainer>
       <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>
-          Manage your shared budgets and preferences.
-        </Text>
+        <Text style={styles.title}>{t('settings.title')}</Text>
+        <Text style={styles.subtitle}>{t('settings.subtitle')}</Text>
       </View>
 
       {currentUser ? (
@@ -67,8 +72,8 @@ export const SettingsScreen: React.FC = () => {
       ) : null}
 
       <SettingsSection
-        title="Shared budgets"
-        description="Switch, create, or manage your shared budgets."
+        title={t('settings.sharedBudgetsTitle')}
+        description={t('settings.sharedBudgetsDescription')}
       >
         {households.map((h, idx) => {
           const memberCount = memberships.filter(
@@ -81,7 +86,7 @@ export const SettingsScreen: React.FC = () => {
               icon={memberCount > 1 ? Users : UserIcon}
               accent={isActive ? 'violet' : undefined}
               label={h.name}
-              value={`${memberCount} ${memberCount === 1 ? 'member' : 'members'}`}
+              value={t('household.members', { count: memberCount })}
               onPress={() => openManage(h.id)}
               isLast={idx === households.length - 1}
             />
@@ -97,15 +102,24 @@ export const SettingsScreen: React.FC = () => {
         ]}
       >
         <Plus size={18} color={colors.primary} strokeWidth={2.6} />
-        <Text style={styles.createLabel}>Create new budget</Text>
+        <Text style={styles.createLabel}>
+          {t('settings.createNewBudget')}
+        </Text>
       </Pressable>
 
-      <SettingsSection title="Preferences">
+      <SettingsSection title={t('settings.preferencesTitle')}>
+        <SettingsRow
+          icon={Globe}
+          accent="mint"
+          label={t('settings.languageRow')}
+          value={currentLangLabel}
+          onPress={openLanguage}
+        />
         <SettingsRow
           icon={Bell}
           accent="sky"
-          label="Notifications"
-          value="On"
+          label={t('settings.notifications')}
+          value={t('settings.notificationsOn')}
           onPress={() => {
             // Notifications screen lands in a future iteration
           }}
@@ -113,22 +127,22 @@ export const SettingsScreen: React.FC = () => {
         />
       </SettingsSection>
 
-      <SettingsSection title="Account">
+      <SettingsSection title={t('settings.accountTitle')}>
         <SettingsRow
           icon={UserIcon}
           accent="mint"
-          label="Profile"
+          label={t('settings.profile')}
           onPress={openProfile}
         />
         <SettingsRow
           icon={KeyRound}
           accent="violet"
-          label="Change password"
+          label={t('settings.changePassword')}
           onPress={openPassword}
         />
         <SettingsRow
           icon={LogOut}
-          label="Log out"
+          label={t('settings.logOut')}
           destructive
           showChevron={false}
           onPress={signOut}

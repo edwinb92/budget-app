@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Bell, Receipt, Tags, type LucideIcon } from 'lucide-react-native';
 
 import {
@@ -30,6 +31,7 @@ const SectionEmpty: React.FC<{ icon: LucideIcon; message: string }> = ({
 );
 
 export const DashboardScreen: React.FC = () => {
+  const { t } = useTranslation();
   const summary = useBudgetStore((s) => s.summary);
   const categories = useBudgetStore((s) => s.categories);
   const bills = useBudgetStore((s) => s.bills);
@@ -38,7 +40,9 @@ export const DashboardScreen: React.FC = () => {
   const setCategoryFilter = useActivityFilterStore((s) => s.setCategoryFilter);
 
   const firstName = currentUser?.name.trim().split(/\s+/)[0] ?? '';
-  const greeting = firstName ? `Hi, ${firstName}` : 'Hi';
+  const greeting = firstName
+    ? t('dashboard.greeting', { name: firstName })
+    : t('dashboard.greetingFallback');
 
   const handleCategoryPress = (category: BudgetCategory) => {
     setCategoryFilter(category.id);
@@ -62,11 +66,14 @@ export const DashboardScreen: React.FC = () => {
         <MonthlySummary summary={summary} />
 
         <View style={styles.section}>
-          <SectionTitle title="Categories" actionLabel="See all" />
+          <SectionTitle
+            title={t('dashboard.categoriesSection')}
+            actionLabel={t('dashboard.seeAll')}
+          />
           {categories.length === 0 ? (
             <SectionEmpty
               icon={Tags}
-              message="No categories yet. Create one to start budgeting."
+              message={t('dashboard.categoriesEmpty')}
             />
           ) : (
             <View style={styles.grid}>
@@ -89,12 +96,12 @@ export const DashboardScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <SectionTitle title="Bills" actionLabel="Manage" />
+          <SectionTitle
+            title={t('dashboard.billsSection')}
+            actionLabel={t('dashboard.manage')}
+          />
           {bills.length === 0 ? (
-            <SectionEmpty
-              icon={Receipt}
-              message="No bills yet. Recurring payments will show up here."
-            />
+            <SectionEmpty icon={Receipt} message={t('dashboard.billsEmpty')} />
           ) : (
             bills.map((bill) => <BillCard key={bill.id} bill={bill} />)
           )}

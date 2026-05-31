@@ -6,6 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pencil, Trash2 } from 'lucide-react-native';
 
@@ -25,6 +26,7 @@ export const MemberActionsSheet: React.FC<MemberActionsSheetProps> = ({
   onEdit,
   onRemove,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const visible = !!member;
 
@@ -63,7 +65,7 @@ export const MemberActionsSheet: React.FC<MemberActionsSheetProps> = ({
             <View style={styles.iconWrap}>
               <Pencil size={18} color={colors.primary} strokeWidth={2.4} />
             </View>
-            <Text style={styles.actionLabel}>Edit member</Text>
+            <Text style={styles.actionLabel}>{t('member.editMember')}</Text>
           </Pressable>
 
           <Pressable
@@ -74,7 +76,7 @@ export const MemberActionsSheet: React.FC<MemberActionsSheetProps> = ({
               <Trash2 size={18} color={colors.status.danger} strokeWidth={2.4} />
             </View>
             <Text style={[styles.actionLabel, styles.actionLabelDanger]}>
-              Remove member
+              {t('member.removeMember')}
             </Text>
           </Pressable>
 
@@ -82,7 +84,7 @@ export const MemberActionsSheet: React.FC<MemberActionsSheetProps> = ({
             onPress={onClose}
             style={({ pressed }) => [styles.cancelBtn, pressed && styles.pressed]}
           >
-            <Text style={styles.cancelLabel}>Cancel</Text>
+            <Text style={styles.cancelLabel}>{t('common.cancel')}</Text>
           </Pressable>
         </Pressable>
       </Pressable>

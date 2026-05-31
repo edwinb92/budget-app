@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react-native';
 
 import { colors, radius, spacing, typography } from '@/theme';
@@ -26,6 +27,7 @@ export const EditMemberModal: React.FC<EditMemberModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [draftName, setDraftName] = useState('');
 
@@ -65,7 +67,7 @@ export const EditMemberModal: React.FC<EditMemberModalProps> = ({
             <View style={styles.handle} />
 
             <View style={styles.header}>
-              <Text style={styles.title}>Edit member</Text>
+              <Text style={styles.title}>{t('member.editTitle')}</Text>
               <Pressable
                 onPress={onClose}
                 hitSlop={12}
@@ -75,7 +77,7 @@ export const EditMemberModal: React.FC<EditMemberModalProps> = ({
               </Pressable>
             </View>
 
-            <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>{t('member.nameLabel')}</Text>
             <TextInput
               value={draftName}
               onChangeText={setDraftName}
@@ -83,7 +85,7 @@ export const EditMemberModal: React.FC<EditMemberModalProps> = ({
               selectionColor={colors.primary}
               autoFocus
               maxLength={48}
-              placeholder="Member name"
+              placeholder={t('member.namePlaceholder')}
               placeholderTextColor={colors.text.faint}
             />
 
@@ -96,7 +98,7 @@ export const EditMemberModal: React.FC<EditMemberModalProps> = ({
                 pressed && isValid && isDirty && styles.pressed,
               ]}
             >
-              <Text style={styles.saveLabel}>Save changes</Text>
+              <Text style={styles.saveLabel}>{t('member.saveChanges')}</Text>
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>

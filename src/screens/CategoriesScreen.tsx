@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react-native';
 
 import { CategoryListItem } from '@/components/categories';
@@ -11,6 +12,7 @@ import { colors, radius, spacing, typography } from '@/theme';
 import { useFormatCurrency } from '@/hooks/useFormatCurrency';
 
 export const CategoriesScreen: React.FC = () => {
+  const { t } = useTranslation();
   const categories = useBudgetStore((s) => s.categories);
   const openCreate = useCategoryEditorStore((s) => s.openCreate);
   const openEdit = useCategoryEditorStore((s) => s.openEdit);
@@ -27,10 +29,13 @@ export const CategoriesScreen: React.FC = () => {
         <View style={styles.titleRow}>
           <View style={styles.titleBlock}>
             <Text style={styles.eyebrow}>
-              Categories ({categories.length})
+              {t('categories.titleWithCount', { count: categories.length })}
             </Text>
             <Text style={styles.subtitle}>
-              {formatMoney(totalSpent)} of {formatMoney(totalBudget)}
+              {t('categories.spentOf', {
+                spent: formatMoney(totalSpent),
+                total: formatMoney(totalBudget),
+              })}
             </Text>
           </View>
 
@@ -40,7 +45,7 @@ export const CategoriesScreen: React.FC = () => {
             hitSlop={8}
           >
             <Plus size={18} color={colors.onPrimary} strokeWidth={2.6} />
-            <Text style={styles.newBtnLabel}>New</Text>
+            <Text style={styles.newBtnLabel}>{t('categories.new')}</Text>
           </Pressable>
         </View>
       </View>

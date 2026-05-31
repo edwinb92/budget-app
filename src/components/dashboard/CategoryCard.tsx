@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AppCard, ProgressBar } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
@@ -17,6 +18,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
   onPress,
 }) => {
+  const { t } = useTranslation();
   const formatMoney = useFormatCurrency();
   const accent = colors.accents[category.accent];
   const remaining = category.budgeted - category.spent;
@@ -44,8 +46,12 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
           numberOfLines={1}
         >
           {overBudget
-            ? `${formatMoney(Math.abs(remaining))} over`
-            : `${formatMoney(remaining)} left`}
+            ? t('categories.overBudget', {
+                amount: formatMoney(Math.abs(remaining)),
+              })
+            : t('categories.remainingAmount', {
+                amount: formatMoney(remaining),
+              })}
         </Text>
 
         <View style={styles.progressRow}>

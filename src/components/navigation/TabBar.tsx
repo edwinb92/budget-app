@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LayoutDashboard, ListChecks, Settings, Tags } from 'lucide-react-native';
 
@@ -7,14 +8,15 @@ import { TabButton } from '@/components/navigation/TabButton';
 import { TabId, useNavStore } from '@/store/navStore';
 import { colors, shadows, spacing } from '@/theme';
 
-const TABS: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'activity', label: 'Activity', icon: ListChecks },
-  { id: 'categories', label: 'Categories', icon: Tags },
-  { id: 'settings', label: 'Settings', icon: Settings },
+const TAB_DEFS: { id: TabId; tKey: string; icon: typeof LayoutDashboard }[] = [
+  { id: 'dashboard', tKey: 'tabs.dashboard', icon: LayoutDashboard },
+  { id: 'activity', tKey: 'tabs.activity', icon: ListChecks },
+  { id: 'categories', tKey: 'tabs.categories', icon: Tags },
+  { id: 'settings', tKey: 'tabs.settings', icon: Settings },
 ];
 
 export const TabBar: React.FC = () => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const activeTab = useNavStore((s) => s.activeTab);
   const setActiveTab = useNavStore((s) => s.setActiveTab);
@@ -27,10 +29,10 @@ export const TabBar: React.FC = () => {
         { paddingBottom: Math.max(insets.bottom, spacing.sm) },
       ]}
     >
-      {TABS.map((tab) => (
+      {TAB_DEFS.map((tab) => (
         <TabButton
           key={tab.id}
-          label={tab.label}
+          label={t(tab.tKey)}
           icon={tab.icon}
           active={activeTab === tab.id}
           onPress={() => setActiveTab(tab.id)}

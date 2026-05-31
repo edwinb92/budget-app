@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Trash2, X } from 'lucide-react-native';
 
@@ -28,6 +29,7 @@ const sanitize = (input: string): number => {
 };
 
 export const ExpenseEditorSheet: React.FC = () => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const editingId = useExpenseEditorStore((s) => s.editingId);
   const close = useExpenseEditorStore((s) => s.close);
@@ -83,12 +85,12 @@ export const ExpenseEditorSheet: React.FC = () => {
     const targetName = category.name.toLowerCase();
     close();
     Alert.alert(
-      'Delete expense',
-      `Remove this ${targetName} expense? This will update your category and monthly totals.`,
+      t('expense.deleteAlertTitle'),
+      t('expense.deleteAlertBody', { category: targetName }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => deleteExpense(targetId),
         },
@@ -123,20 +125,20 @@ export const ExpenseEditorSheet: React.FC = () => {
                 <Icon size={20} color={accent.base} strokeWidth={2.2} />
               </View>
               <View style={styles.headerText}>
-                <Text style={styles.eyebrow}>Edit expense</Text>
+                <Text style={styles.eyebrow}>{t('expense.editTitle')}</Text>
                 <Text style={styles.categoryName} numberOfLines={1}>
                   {category.name}
                 </Text>
                 {payer ? (
                   <Text style={styles.payerLabel} numberOfLines={1}>
-                    Paid by:{' '}
+                    {t('expense.paidBy')}
                     <Text
                       style={[
                         styles.payerName,
                         { color: colors.accents[payer.accent].base },
                       ]}
                     >
-                      {payer.id === currentUserId ? 'You' : payer.name}
+                      {payer.id === currentUserId ? t('common.you') : payer.name}
                     </Text>
                   </Text>
                 ) : null}
@@ -153,7 +155,7 @@ export const ExpenseEditorSheet: React.FC = () => {
               </Pressable>
             </View>
 
-            <Text style={styles.label}>Amount</Text>
+            <Text style={styles.label}>{t('expense.amount')}</Text>
             <View
               style={[
                 styles.amountRow,
@@ -174,13 +176,13 @@ export const ExpenseEditorSheet: React.FC = () => {
               />
             </View>
 
-            <Text style={styles.label}>What was this for?</Text>
+            <Text style={styles.label}>{t('expense.description')}</Text>
             <TextInput
               value={draftNote}
               onChangeText={setDraftNote}
               style={styles.noteInput}
               selectionColor={colors.primary}
-              placeholder="e.g. Pizza with friends"
+              placeholder={t('expense.descriptionPlaceholder')}
               placeholderTextColor={colors.text.faint}
               multiline
               maxLength={140}
@@ -188,9 +190,7 @@ export const ExpenseEditorSheet: React.FC = () => {
             />
             <Text style={styles.noteCounter}>{draftNote.length}/140</Text>
 
-            <Text style={styles.hint}>
-              Need to change the category? Delete this expense and add it again.
-            </Text>
+            <Text style={styles.hint}>{t('expense.changeCategoryHint')}</Text>
 
             <Pressable
               onPress={handleSave}
@@ -201,7 +201,7 @@ export const ExpenseEditorSheet: React.FC = () => {
                 pressed && canSave && styles.pressed,
               ]}
             >
-              <Text style={styles.saveLabel}>Save changes</Text>
+              <Text style={styles.saveLabel}>{t('expense.saveChanges')}</Text>
             </Pressable>
 
             <Pressable
@@ -212,7 +212,7 @@ export const ExpenseEditorSheet: React.FC = () => {
               ]}
             >
               <Trash2 size={18} color={colors.status.danger} strokeWidth={2.4} />
-              <Text style={styles.deleteLabel}>Delete expense</Text>
+              <Text style={styles.deleteLabel}>{t('expense.deleteButton')}</Text>
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>

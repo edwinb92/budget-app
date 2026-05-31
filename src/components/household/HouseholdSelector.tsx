@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, User, Users } from 'lucide-react-native';
 
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
@@ -10,6 +11,7 @@ import {
 import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 export const HouseholdSelector: React.FC = () => {
+  const { t } = useTranslation();
   const household = useHouseholdStore(selectActiveHousehold);
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
   const memberships = useHouseholdStore((s) => s.memberships);
@@ -39,13 +41,13 @@ export const HouseholdSelector: React.FC = () => {
       </View>
 
       <View style={styles.text}>
-        <Text style={styles.eyebrow}>Active budget</Text>
+        <Text style={styles.eyebrow}>{t('household.activeBudget')}</Text>
         <Text style={styles.name} numberOfLines={1}>
           {household.name}
         </Text>
         <View style={styles.metaRow}>
           <Text style={styles.metaText}>
-            {memberCount} {memberCount === 1 ? 'member' : 'members'}
+            {t('household.members', { count: memberCount })}
           </Text>
           <View style={styles.metaDot} />
           <Text style={styles.metaText}>{household.currency}</Text>

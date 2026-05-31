@@ -1,0 +1,213 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "close": "Close",
+    "edit": "Edit",
+    "remove": "Remove",
+    "send": "Send",
+    "saving": "Saving...",
+    "you": "You"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "activity": "Activity",
+    "categories": "Categories",
+    "settings": "Settings"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create your account",
+    "signInSubtitle": "Sign in to your shared budgets.",
+    "signUpSubtitle": "Start tracking your shared budgets.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 6 characters",
+    "signInButton": "Sign in",
+    "signUpButton": "Create account",
+    "toggleToSignUp": "Don't have an account? ",
+    "toggleToSignIn": "Already have an account? ",
+    "signUp": "Sign up",
+    "signIn": "Sign in"
+  },
+  "dashboard": {
+    "greeting": "Hi, {{name}}",
+    "greetingFallback": "Hi",
+    "categoriesSection": "Categories",
+    "billsSection": "Bills",
+    "seeAll": "See all",
+    "manage": "Manage",
+    "categoriesEmpty": "No categories yet. Create one to start budgeting.",
+    "billsEmpty": "No bills yet. Recurring payments will show up here."
+  },
+  "summary": {
+    "remainingThisMonth": "Remaining this month",
+    "budgeted": "Budgeted",
+    "spent": "Spent"
+  },
+  "activity": {
+    "title": "Activity",
+    "titleWithCount": "Activity ({{count}})",
+    "filteredTitle": "Filtered activity",
+    "filteringBy": "Filtering by",
+    "nothingYet": "Nothing here yet.",
+    "emptyTitle": "No expenses yet",
+    "emptySubtitle": "Tap the + button to add your first expense.",
+    "emptyFiltered": "No expenses in this category yet.",
+    "expensesCount_one": "{{count}} expense",
+    "expensesCount_other": "{{count}} expenses",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "categories": {
+    "title": "Categories",
+    "titleWithCount": "Categories ({{count}})",
+    "new": "New",
+    "spentOf": "{{spent}} of {{total}}",
+    "remainingAmount": "{{amount}} left",
+    "overBudget": "{{amount}} over",
+    "editor": {
+      "newTitle": "New category",
+      "editTitle": "Edit category",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Groceries",
+      "budgetLabel": "Monthly budget",
+      "iconLabel": "Icon",
+      "colorLabel": "Color",
+      "deleteButton": "Delete category",
+      "saveButton": "Save changes",
+      "createButton": "Create category"
+    }
+  },
+  "expense": {
+    "editTitle": "Edit expense",
+    "amount": "Amount",
+    "description": "What was this for?",
+    "descriptionPlaceholder": "e.g. Pizza with friends",
+    "paidBy": "Paid by: ",
+    "saveChanges": "Save changes",
+    "deleteButton": "Delete expense",
+    "deleteAlertTitle": "Delete expense",
+    "deleteAlertBody": "Remove this {{category}} expense? This will update your category and monthly totals.",
+    "changeCategoryHint": "Need to change the category? Delete this expense and add it again."
+  },
+  "wizard": {
+    "newExpense": "New expense",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save expense",
+    "stepOf": "Step {{current}} of {{total}}",
+    "stepCategoryTitle": "What category?",
+    "stepCategorySubtitle": "Pick where this expense belongs.",
+    "stepAmountTitle": "How much?",
+    "stepAmountSubtitle": "Type the amount or tap a quick pick.",
+    "stepNoteTitle": "Any note?",
+    "stepNoteSubtitle": "Optional — skip if you don't need one.",
+    "stepNotePlaceholder": "e.g. Pizza with friends",
+    "stepPersonTitle": "Who paid?",
+    "stepPersonSubtitle": "So we can split fairly later."
+  },
+  "household": {
+    "activeBudget": "Active budget",
+    "members_one": "{{count}} member",
+    "members_other": "{{count}} members",
+    "newBudget": "New budget",
+    "createIntro": "Create a shared budget to track expenses with someone — like your home, a trip, or a special event.",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Casa Principal",
+    "currencyLabel": "Currency",
+    "currencyHint": "You can change this later from budget settings.",
+    "nameOwnerHint": "Only the owner can rename this budget.",
+    "createBudget": "Create budget",
+    "manageBudget": "Manage budget",
+    "membersSection": "Members ({{count}})",
+    "invite": "Invite",
+    "dangerZone": "Danger zone",
+    "leaveBudget": "Leave budget",
+    "deleteBudget": "Delete budget",
+    "sharedBudgets": "Shared budgets",
+    "pickerSubtitle": "Switch between your shared budgets.",
+    "createNew": "Create new budget",
+    "manageCurrent": "Manage current budget"
+  },
+  "member": {
+    "you": " (you)",
+    "owner": "Owner",
+    "editMember": "Edit member",
+    "removeMember": "Remove member",
+    "editTitle": "Edit member",
+    "nameLabel": "Name",
+    "namePlaceholder": "Member name",
+    "saveChanges": "Save changes",
+    "removeAlertTitle": "Remove member",
+    "removeAlertBody": "Remove {{name}} from {{household}}? They won't have access to this budget anymore."
+  },
+  "invite": {
+    "title": "Invite to budget",
+    "subtitle": "We'll email them a link to join this budget.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "sendButton": "Send invitation",
+    "sentTitle": "Invitation sent",
+    "sentBody": "We sent an invite to {{email}}. They'll appear here once they accept."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your shared budgets and preferences.",
+    "sharedBudgetsTitle": "Shared budgets",
+    "sharedBudgetsDescription": "Switch, create, or manage your shared budgets.",
+    "createNewBudget": "Create new budget",
+    "preferencesTitle": "Preferences",
+    "notifications": "Notifications",
+    "notificationsOn": "On",
+    "languageRow": "Language",
+    "accountTitle": "Account",
+    "profile": "Profile",
+    "changePassword": "Change password",
+    "logOut": "Log out"
+  },
+  "profile": {
+    "editorEyebrow": "Edit profile",
+    "editorTitle": "Your details",
+    "preview": "Preview",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "accentLabel": "Accent color",
+    "emailLabel": "Email",
+    "emailReadonly": "Email can't be changed for now.",
+    "saveChanges": "Save changes",
+    "saving": "Saving..."
+  },
+  "password": {
+    "eyebrow": "Security",
+    "title": "Change password",
+    "newLabel": "New password",
+    "newPlaceholder": "At least 6 characters",
+    "confirmLabel": "Confirm new password",
+    "confirmPlaceholder": "Repeat the password",
+    "tooShort": "Password must be at least 6 characters.",
+    "noMatch": "Passwords don't match.",
+    "updateButton": "Update password",
+    "updating": "Updating...",
+    "updatedTitle": "Password updated",
+    "updatedBody": "Your password has been changed."
+  },
+  "bills": {
+    "dueDay": "Due day {{day}}",
+    "paid": "Paid",
+    "pending": "Pending"
+  },
+  "mutation": {
+    "saving": "Saving..."
+  },
+  "language": {
+    "title": "Language",
+    "subtitle": "Choose the language you want to use in the app.",
+    "english": "English",
+    "spanish": "Spanish"
+  }
+}

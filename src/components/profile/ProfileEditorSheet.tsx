@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react-native';
 
 import { AccentPicker } from '@/components/categories/AccentPicker';
@@ -26,6 +27,7 @@ export const ProfileEditorSheet: React.FC = () => {
   const isOpen = useProfileEditorStore((s) => s.profileOpen);
   const close = useProfileEditorStore((s) => s.closeProfile);
 
+  const { t } = useTranslation();
   const currentUser = useHouseholdStore(selectCurrentUser);
   const updateUser = useHouseholdStore((s) => s.updateUser);
 
@@ -87,8 +89,8 @@ export const ProfileEditorSheet: React.FC = () => {
 
             <View style={styles.header}>
               <View style={styles.headerText}>
-                <Text style={styles.eyebrow}>Edit profile</Text>
-                <Text style={styles.title}>Your details</Text>
+                <Text style={styles.eyebrow}>{t('profile.editorEyebrow')}</Text>
+                <Text style={styles.title}>{t('profile.editorTitle')}</Text>
               </View>
               <Pressable
                 onPress={close}
@@ -118,33 +120,33 @@ export const ProfileEditorSheet: React.FC = () => {
                   {previewInitial}
                 </Text>
               </View>
-              <Text style={styles.previewLabel}>Preview</Text>
+              <Text style={styles.previewLabel}>{t('profile.preview')}</Text>
             </View>
 
-            <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>{t('profile.nameLabel')}</Text>
             <TextInput
               value={draftName}
               onChangeText={setDraftName}
               style={styles.input}
               selectionColor={colors.primary}
-              placeholder="Your name"
+              placeholder={t('profile.namePlaceholder')}
               placeholderTextColor={colors.text.faint}
               maxLength={48}
               autoCapitalize="words"
             />
 
-            <Text style={styles.label}>Accent color</Text>
+            <Text style={styles.label}>{t('profile.accentLabel')}</Text>
             <View style={styles.accentRow}>
               <AccentPicker value={draftAccent} onChange={setDraftAccent} />
             </View>
 
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('profile.emailLabel')}</Text>
             <View style={[styles.input, styles.readonlyInput]}>
               <Text style={styles.readonlyText} numberOfLines={1}>
                 {currentUser.email}
               </Text>
             </View>
-            <Text style={styles.hint}>Email can&apos;t be changed for now.</Text>
+            <Text style={styles.hint}>{t('profile.emailReadonly')}</Text>
 
             <Pressable
               onPress={handleSave}
@@ -156,7 +158,7 @@ export const ProfileEditorSheet: React.FC = () => {
               ]}
             >
               <Text style={styles.saveLabel}>
-                {submitting ? 'Saving...' : 'Save changes'}
+                {submitting ? t('profile.saving') : t('profile.saveChanges')}
               </Text>
             </Pressable>
           </Pressable>

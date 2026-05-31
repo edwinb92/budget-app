@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react-native';
 
 import { ActivityEmptyState, DayGroup } from '@/components/activity';
@@ -13,6 +14,7 @@ import { colors, radius, spacing, typography } from '@/theme';
 import { groupByDay } from '@/utils/date';
 
 export const ActivityFeedScreen: React.FC = () => {
+  const { t } = useTranslation();
   const allExpenses = useBudgetStore((s) => s.expenses);
   const categoryId = useActivityFilterStore((s) => s.categoryId);
   const clearFilter = useActivityFilterStore((s) => s.clearFilter);
@@ -48,16 +50,18 @@ export const ActivityFeedScreen: React.FC = () => {
 
       <View style={styles.header}>
         <Text style={styles.eyebrow}>
-          {isFiltering ? 'Filtered activity' : `Activity (${expenses.length})`}
+          {isFiltering
+            ? t('activity.filteredTitle')
+            : t('activity.titleWithCount', { count: expenses.length })}
         </Text>
         <Text style={styles.subtitle}>
           {expenses.length === 0
             ? isFiltering
-              ? 'No expenses in this category yet.'
-              : 'Nothing here yet.'
-            : `${expenses.length} ${
-                expenses.length === 1 ? 'expense' : 'expenses'
-              } · ${formatMoney(totalThisMonth)}`}
+              ? t('activity.emptyFiltered')
+              : t('activity.nothingYet')
+            : `${t('activity.expensesCount', {
+                count: expenses.length,
+              })} · ${formatMoney(totalThisMonth)}`}
         </Text>
       </View>
 
@@ -74,7 +78,7 @@ export const ActivityFeedScreen: React.FC = () => {
             <FilterIcon size={14} color={colors.onPrimary} strokeWidth={2.4} />
           </View>
           <View style={styles.chipText}>
-            <Text style={styles.chipEyebrow}>Filtering by</Text>
+            <Text style={styles.chipEyebrow}>{t('activity.filteringBy')}</Text>
             <Text style={[styles.chipName, { color: accent.base }]} numberOfLines={1}>
               {filterCategory.name}
             </Text>

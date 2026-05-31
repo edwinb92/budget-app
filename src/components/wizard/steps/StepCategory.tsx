@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { OptionTile } from '@/components/wizard/OptionTile';
 import { getCategoryIcon } from '@/data/icons';
@@ -8,14 +9,15 @@ import { useWizardStore } from '@/store/wizardStore';
 import { colors, spacing, typography } from '@/theme';
 
 export const StepCategory: React.FC = () => {
+  const { t } = useTranslation();
   const categories = useBudgetStore((s) => s.categories);
   const selected = useWizardStore((s) => s.draft.categoryId);
   const setCategoryId = useWizardStore((s) => s.setCategoryId);
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>What category?</Text>
-      <Text style={styles.subtitle}>Pick where this expense belongs.</Text>
+      <Text style={styles.title}>{t('wizard.stepCategoryTitle')}</Text>
+      <Text style={styles.subtitle}>{t('wizard.stepCategorySubtitle')}</Text>
 
       <View style={styles.grid}>
         {categories.map((category, index) => (

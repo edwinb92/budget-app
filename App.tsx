@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -14,6 +14,7 @@ import {
 import { QuickAddButton } from '@/components/dashboard';
 import {
   ChangePasswordSheet,
+  LanguageSheet,
   ProfileEditorSheet,
 } from '@/components/profile';
 import { MutationIndicator } from '@/components/ui';
@@ -24,6 +25,7 @@ import { AuthScreen } from '@/screens/auth';
 import { CategoriesScreen } from '@/screens/CategoriesScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
+import { initI18n } from '@/i18n';
 import { subscribeToHousehold } from '@/lib/realtime';
 import { initAuth, useAuthStore } from '@/store/authStore';
 import { useBudgetStore } from '@/store/budgetStore';
@@ -84,6 +86,7 @@ const Shell: React.FC = () => {
       <ManageHouseholdModal />
       <ProfileEditorSheet />
       <ChangePasswordSheet />
+      <LanguageSheet />
       <MutationIndicator />
     </View>
   );
@@ -94,6 +97,11 @@ const Root: React.FC = () => {
   const initializing = useAuthStore((s) => s.initializing);
   const userId = session?.user.id ?? null;
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
+  const [i18nReady, setI18nReady] = useState(false);
+
+  useEffect(() => {
+    void initI18n().then(() => setI18nReady(true));
+  }, []);
 
   useEffect(() => initAuth(), []);
 
@@ -116,7 +124,7 @@ const Root: React.FC = () => {
     return unsubscribe;
   }, [activeHouseholdId]);
 
-  if (initializing) {
+  if (initializing || !i18nReady) {
     return (
       <View style={[styles.root, styles.centered]}>
         <ActivityIndicator color={colors.primary} size="large" />

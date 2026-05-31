@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 import { ProgressBar } from '@/components/ui';
 import { getCategoryIcon } from '@/data/icons';
@@ -18,6 +19,7 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
   category,
   onPress,
 }) => {
+  const { t } = useTranslation();
   const formatMoney = useFormatCurrency();
   const accent = colors.accents[category.accent];
   const Icon = getCategoryIcon(category.iconKey);
@@ -48,8 +50,12 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
             numberOfLines={1}
           >
             {overBudget
-              ? `${formatMoney(Math.abs(remaining))} over`
-              : `${formatMoney(remaining)} left`}
+              ? t('categories.overBudget', {
+                  amount: formatMoney(Math.abs(remaining)),
+                })
+              : t('categories.remainingAmount', {
+                  amount: formatMoney(remaining),
+                })}
           </Text>
         </View>
 
@@ -66,7 +72,10 @@ export const CategoryListItem: React.FC<CategoryListItemProps> = ({
         </View>
 
         <Text style={styles.budget}>
-          {formatMoney(category.spent)} of {formatMoney(category.budgeted)}
+          {t('categories.spentOf', {
+            spent: formatMoney(category.spent),
+            total: formatMoney(category.budgeted),
+          })}
         </Text>
       </View>
 

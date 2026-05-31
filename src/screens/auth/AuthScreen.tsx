@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wallet } from 'lucide-react-native';
 
@@ -21,6 +22,7 @@ type Mode = 'signIn' | 'signUp';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const AuthScreen: React.FC = () => {
+  const { t } = useTranslation();
   const signIn = useAuthStore((s) => s.signIn);
   const signUp = useAuthStore((s) => s.signUp);
 
@@ -74,24 +76,22 @@ export const AuthScreen: React.FC = () => {
               <Wallet size={28} color={colors.onPrimary} strokeWidth={2.4} />
             </View>
             <Text style={styles.title}>
-              {isSignUp ? 'Create your account' : 'Welcome back'}
+              {isSignUp ? t('auth.createAccount') : t('auth.welcomeBack')}
             </Text>
             <Text style={styles.subtitle}>
-              {isSignUp
-                ? 'Start tracking your shared budgets.'
-                : 'Sign in to your shared budgets.'}
+              {isSignUp ? t('auth.signUpSubtitle') : t('auth.signInSubtitle')}
             </Text>
           </View>
 
           <View style={styles.form}>
             {isSignUp ? (
               <View style={styles.field}>
-                <Text style={styles.label}>Name</Text>
+                <Text style={styles.label}>{t('auth.nameLabel')}</Text>
                 <TextInput
                   value={name}
                   onChangeText={setName}
                   style={styles.input}
-                  placeholder="Your name"
+                  placeholder={t('auth.namePlaceholder')}
                   placeholderTextColor={colors.text.faint}
                   selectionColor={colors.primary}
                   autoCapitalize="words"
@@ -101,12 +101,12 @@ export const AuthScreen: React.FC = () => {
             ) : null}
 
             <View style={styles.field}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t('auth.emailLabel')}</Text>
               <TextInput
                 value={email}
                 onChangeText={setEmail}
                 style={styles.input}
-                placeholder="name@example.com"
+                placeholder={t('auth.emailPlaceholder')}
                 placeholderTextColor={colors.text.faint}
                 selectionColor={colors.primary}
                 autoCapitalize="none"
@@ -116,12 +116,12 @@ export const AuthScreen: React.FC = () => {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>{t('auth.passwordLabel')}</Text>
               <TextInput
                 value={password}
                 onChangeText={setPassword}
                 style={styles.input}
-                placeholder="At least 6 characters"
+                placeholder={t('auth.passwordPlaceholder')}
                 placeholderTextColor={colors.text.faint}
                 selectionColor={colors.primary}
                 secureTextEntry
@@ -146,7 +146,7 @@ export const AuthScreen: React.FC = () => {
                 <ActivityIndicator color={colors.onPrimary} />
               ) : (
                 <Text style={styles.submitLabel}>
-                  {isSignUp ? 'Create account' : 'Sign in'}
+                  {isSignUp ? t('auth.signUpButton') : t('auth.signInButton')}
                 </Text>
               )}
             </Pressable>
@@ -154,11 +154,9 @@ export const AuthScreen: React.FC = () => {
 
           <Pressable onPress={toggleMode} hitSlop={8} style={styles.toggle}>
             <Text style={styles.toggleText}>
-              {isSignUp
-                ? 'Already have an account? '
-                : "Don't have an account? "}
+              {isSignUp ? t('auth.toggleToSignIn') : t('auth.toggleToSignUp')}
               <Text style={styles.toggleLink}>
-                {isSignUp ? 'Sign in' : 'Sign up'}
+                {isSignUp ? t('auth.signIn') : t('auth.signUp')}
               </Text>
             </Text>
           </Pressable>

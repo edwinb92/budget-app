@@ -1,22 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useWizardStore } from '@/store/wizardStore';
 import { colors, radius, spacing, typography } from '@/theme';
 
 export const StepNote: React.FC = () => {
+  const { t } = useTranslation();
   const note = useWizardStore((s) => s.draft.note);
   const setNote = useWizardStore((s) => s.setNote);
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>Any note?</Text>
-      <Text style={styles.subtitle}>Optional — skip if you don't need one.</Text>
+      <Text style={styles.title}>{t('wizard.stepNoteTitle')}</Text>
+      <Text style={styles.subtitle}>{t('wizard.stepNoteSubtitle')}</Text>
 
       <TextInput
         value={note}
         onChangeText={setNote}
-        placeholder="e.g. Pizza with friends"
+        placeholder={t('wizard.stepNotePlaceholder')}
         placeholderTextColor={colors.text.faint}
         style={styles.input}
         multiline

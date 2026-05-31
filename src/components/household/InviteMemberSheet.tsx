@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mail, X } from 'lucide-react-native';
 
@@ -28,6 +29,7 @@ export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
   householdName,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
 
@@ -43,8 +45,8 @@ export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
     const target = trimmed;
     onClose();
     Alert.alert(
-      'Invitation sent',
-      `We sent an invite to ${target}. They'll appear here once they accept.`,
+      t('invite.sentTitle'),
+      t('invite.sentBody', { email: target }),
     );
   };
 
@@ -75,7 +77,7 @@ export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
                 <Mail size={20} color={colors.onPrimary} strokeWidth={2.4} />
               </View>
               <View style={styles.headerText}>
-                <Text style={styles.eyebrow}>Invite to budget</Text>
+                <Text style={styles.eyebrow}>{t('invite.title')}</Text>
                 <Text style={styles.title} numberOfLines={1}>
                   {householdName}
                 </Text>
@@ -92,17 +94,15 @@ export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
               </Pressable>
             </View>
 
-            <Text style={styles.subtitle}>
-              We&apos;ll email them a link to join this budget.
-            </Text>
+            <Text style={styles.subtitle}>{t('invite.subtitle')}</Text>
 
-            <Text style={styles.label}>Email address</Text>
+            <Text style={styles.label}>{t('invite.emailLabel')}</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
               style={styles.input}
               selectionColor={colors.primary}
-              placeholder="name@example.com"
+              placeholder={t('invite.emailPlaceholder')}
               placeholderTextColor={colors.text.faint}
               autoCapitalize="none"
               autoCorrect={false}
@@ -121,7 +121,7 @@ export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
                 pressed && isValid && styles.pressed,
               ]}
             >
-              <Text style={styles.sendLabel}>Send invitation</Text>
+              <Text style={styles.sendLabel}>{t('invite.sendButton')}</Text>
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>

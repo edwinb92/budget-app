@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, X } from 'lucide-react-native';
 
 import { colors, radius, spacing, typography } from '@/theme';
@@ -19,6 +20,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
   onBack,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const progress = (stepIndex + 1) / totalSteps;
 
   return (
@@ -42,7 +44,7 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
         </Pressable>
 
         <Text style={styles.step}>
-          Step {stepIndex + 1} of {totalSteps}
+          {t('wizard.stepOf', { current: stepIndex + 1, total: totalSteps })}
         </Text>
 
         <Pressable
