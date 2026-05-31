@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.md,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(255, 122, 107, 0.08)',
+    backgroundColor: 'rgba(220, 38, 38, 0.08)',
   },
   deleteLabel: {
     ...typography.subtitle,

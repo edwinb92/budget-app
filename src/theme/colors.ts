@@ -41,7 +41,7 @@ export const palette = {
 
   success: '#22C5A5',
   warning: '#F5A524',
-  danger: '#FF7A6B',
+  danger: '#DC2626',
 } as const;
 
 export const colors = {

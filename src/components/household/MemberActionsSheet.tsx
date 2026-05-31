@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconWrapDanger: {
-    backgroundColor: 'rgba(255, 122, 107, 0.12)',
+    backgroundColor: 'rgba(220, 38, 38, 0.12)',
   },
   actionLabel: {
     ...typography.subtitle,

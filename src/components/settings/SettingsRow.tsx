@@ -31,7 +31,7 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
     ? colors.status.danger
     : accentColor?.base ?? colors.primary;
   const iconBg = destructive
-    ? 'rgba(255, 122, 107, 0.12)'
+    ? 'rgba(220, 38, 38, 0.12)'
     : accentColor?.soft ?? colors.primarySoft;
 
   return (
