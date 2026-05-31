@@ -12,6 +12,10 @@ import {
   ManageHouseholdModal,
 } from '@/components/household';
 import { QuickAddButton } from '@/components/dashboard';
+import {
+  ChangePasswordSheet,
+  ProfileEditorSheet,
+} from '@/components/profile';
 import { TabBar } from '@/components/navigation/TabBar';
 import { ExpenseWizard } from '@/components/wizard';
 import { ActivityFeedScreen } from '@/screens/ActivityFeedScreen';
@@ -77,6 +81,8 @@ const Shell: React.FC = () => {
       <HouseholdPickerSheet />
       <CreateHouseholdModal />
       <ManageHouseholdModal />
+      <ProfileEditorSheet />
+      <ChangePasswordSheet />
     </View>
   );
 };

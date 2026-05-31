@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   Bell,
+  KeyRound,
   LogOut,
   Plus,
   User as UserIcon,
@@ -12,6 +13,7 @@ import { SettingsRow, SettingsSection } from '@/components/settings';
 import { ScreenContainer } from '@/components/ui';
 import { useAuthStore } from '@/store/authStore';
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
+import { useProfileEditorStore } from '@/store/profileEditorStore';
 import {
   selectActiveHousehold,
   selectCurrentUser,
@@ -27,6 +29,8 @@ export const SettingsScreen: React.FC = () => {
 
   const openCreate = useHouseholdEditorStore((s) => s.openCreate);
   const openManage = useHouseholdEditorStore((s) => s.openManage);
+  const openProfile = useProfileEditorStore((s) => s.openProfile);
+  const openPassword = useProfileEditorStore((s) => s.openPassword);
   const signOut = useAuthStore((s) => s.signOut);
 
   return (
@@ -114,9 +118,13 @@ export const SettingsScreen: React.FC = () => {
           icon={UserIcon}
           accent="mint"
           label="Profile"
-          onPress={() => {
-            // Profile editor lands with Supabase Auth
-          }}
+          onPress={openProfile}
+        />
+        <SettingsRow
+          icon={KeyRound}
+          accent="violet"
+          label="Change password"
+          onPress={openPassword}
         />
         <SettingsRow
           icon={LogOut}

@@ -26,7 +26,7 @@ interface HouseholdState {
   removeUserFromHousehold: (householdId: string, userId: string) => Promise<void>;
   deleteHousehold: (id: string) => Promise<void>;
   addMembership: (input: { householdId: string; userId: string; role: Membership['role'] }) => Promise<void>;
-  updateUser: (userId: string, patch: Partial<Pick<User, 'name' | 'email'>>) => Promise<void>;
+  updateUser: (userId: string, patch: Partial<Pick<User, 'name' | 'email' | 'accent'>>) => Promise<void>;
 }
 
 const mapProfile = (p: {
@@ -156,9 +156,10 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
   },
 
   updateUser: async (userId, patch) => {
-    const update: { name?: string; email?: string } = {};
+    const update: { name?: string; email?: string; accent?: string } = {};
     if (patch.name !== undefined) update.name = patch.name.trim();
     if (patch.email !== undefined) update.email = patch.email.trim();
+    if (patch.accent !== undefined) update.accent = patch.accent;
     await supabase.from('profiles').update(update).eq('id', userId);
     await get().fetchAll();
   },
