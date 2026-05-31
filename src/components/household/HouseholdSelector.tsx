@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ChevronDown, Users } from 'lucide-react-native';
+import { ChevronDown, User, Users } from 'lucide-react-native';
 
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
 import {
@@ -31,7 +31,11 @@ export const HouseholdSelector: React.FC = () => {
       ]}
     >
       <View style={styles.iconWrap}>
-        <Users size={20} color={colors.onPrimary} strokeWidth={2.4} />
+        {memberCount > 1 ? (
+          <Users size={20} color={colors.onPrimary} strokeWidth={2.4} />
+        ) : (
+          <User size={20} color={colors.onPrimary} strokeWidth={2.4} />
+        )}
       </View>
 
       <View style={styles.text}>

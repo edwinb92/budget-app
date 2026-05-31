@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Check, Plus, Settings2, Users } from 'lucide-react-native';
+import { Check, Plus, Settings2, User, Users } from 'lucide-react-native';
 
 import { useHouseholdEditorStore } from '@/store/householdEditorStore';
 import {
@@ -61,6 +61,7 @@ export const HouseholdPickerSheet: React.FC = () => {
               const memberCount = memberships.filter(
                 (m) => m.householdId === h.id,
               ).length;
+              const HouseholdIcon = memberCount > 1 ? Users : User;
 
               return (
                 <Pressable
@@ -81,7 +82,7 @@ export const HouseholdPickerSheet: React.FC = () => {
                       isActive && { backgroundColor: colors.primarySoft },
                     ]}
                   >
-                    <Users
+                    <HouseholdIcon
                       size={18}
                       color={isActive ? colors.primary : colors.text.muted}
                       strokeWidth={2.4}

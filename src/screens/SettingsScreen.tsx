@@ -74,7 +74,7 @@ export const SettingsScreen: React.FC = () => {
           return (
             <SettingsRow
               key={h.id}
-              icon={Users}
+              icon={memberCount > 1 ? Users : UserIcon}
               accent={isActive ? 'violet' : undefined}
               label={h.name}
               value={`${memberCount} ${memberCount === 1 ? 'member' : 'members'}`}
