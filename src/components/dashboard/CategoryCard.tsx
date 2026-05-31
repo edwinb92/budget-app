@@ -46,7 +46,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
+        <Text style={[styles.name, { color: accent.base }]} numberOfLines={1}>
           {category.name}
         </Text>
         <Text
