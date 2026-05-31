@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { supabase } from '@/lib/supabase';
+import { withMutation } from '@/store/mutationStore';
 import type { AccentName } from '@/theme';
 import type {
   CurrencyCode,
@@ -101,68 +102,75 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
 
   setActiveHousehold: (id) => set({ activeHouseholdId: id }),
 
-  createHousehold: async ({ name, currency }) => {
-    const userId = get().currentUserId;
-    if (!userId) return;
+  createHousehold: async ({ name, currency }) =>
+    withMutation(async () => {
+      const userId = get().currentUserId;
+      if (!userId) return;
 
-    const { data, error } = await supabase
-      .from('households')
-      .insert({ name: name.trim(), currency, created_by: userId })
-      .select('id')
-      .single();
-    if (error || !data) return;
+      const { data, error } = await supabase
+        .from('households')
+        .insert({ name: name.trim(), currency, created_by: userId })
+        .select('id')
+        .single();
+      if (error || !data) return;
 
-    await supabase.from('memberships').insert({
-      household_id: data.id,
-      user_id: userId,
-      role: 'owner',
-    });
+      await supabase.from('memberships').insert({
+        household_id: data.id,
+        user_id: userId,
+        role: 'owner',
+      });
 
-    await get().fetchAll();
-    set({ activeHouseholdId: data.id });
-  },
+      await get().fetchAll();
+      set({ activeHouseholdId: data.id });
+    }),
 
-  renameHousehold: async (id, name) => {
-    await supabase.from('households').update({ name: name.trim() }).eq('id', id);
-    await get().fetchAll();
-  },
+  renameHousehold: async (id, name) =>
+    withMutation(async () => {
+      await supabase.from('households').update({ name: name.trim() }).eq('id', id);
+      await get().fetchAll();
+    }),
 
-  setHouseholdCurrency: async (id, currency) => {
-    await supabase.from('households').update({ currency }).eq('id', id);
-    await get().fetchAll();
-  },
+  setHouseholdCurrency: async (id, currency) =>
+    withMutation(async () => {
+      await supabase.from('households').update({ currency }).eq('id', id);
+      await get().fetchAll();
+    }),
 
-  removeUserFromHousehold: async (householdId, userId) => {
-    await supabase
-      .from('memberships')
-      .delete()
-      .eq('household_id', householdId)
-      .eq('user_id', userId);
-    await get().fetchAll();
-  },
+  removeUserFromHousehold: async (householdId, userId) =>
+    withMutation(async () => {
+      await supabase
+        .from('memberships')
+        .delete()
+        .eq('household_id', householdId)
+        .eq('user_id', userId);
+      await get().fetchAll();
+    }),
 
-  deleteHousehold: async (id) => {
-    await supabase.from('households').delete().eq('id', id);
-    await get().fetchAll();
-  },
+  deleteHousehold: async (id) =>
+    withMutation(async () => {
+      await supabase.from('households').delete().eq('id', id);
+      await get().fetchAll();
+    }),
 
-  addMembership: async ({ householdId, userId, role }) => {
-    await supabase.from('memberships').insert({
-      household_id: householdId,
-      user_id: userId,
-      role,
-    });
-    await get().fetchAll();
-  },
+  addMembership: async ({ householdId, userId, role }) =>
+    withMutation(async () => {
+      await supabase.from('memberships').insert({
+        household_id: householdId,
+        user_id: userId,
+        role,
+      });
+      await get().fetchAll();
+    }),
 
-  updateUser: async (userId, patch) => {
-    const update: { name?: string; email?: string; accent?: string } = {};
-    if (patch.name !== undefined) update.name = patch.name.trim();
-    if (patch.email !== undefined) update.email = patch.email.trim();
-    if (patch.accent !== undefined) update.accent = patch.accent;
-    await supabase.from('profiles').update(update).eq('id', userId);
-    await get().fetchAll();
-  },
+  updateUser: async (userId, patch) =>
+    withMutation(async () => {
+      const update: { name?: string; email?: string; accent?: string } = {};
+      if (patch.name !== undefined) update.name = patch.name.trim();
+      if (patch.email !== undefined) update.email = patch.email.trim();
+      if (patch.accent !== undefined) update.accent = patch.accent;
+      await supabase.from('profiles').update(update).eq('id', userId);
+      await get().fetchAll();
+    }),
 }));
 
 export const selectActiveHousehold = (s: HouseholdState): Household | undefined =>

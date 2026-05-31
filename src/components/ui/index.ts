@@ -3,3 +3,4 @@ export { AppCard } from './AppCard';
 export { SectionTitle } from './SectionTitle';
 export { ProgressBar } from './ProgressBar';
 export { PrimaryButton } from './PrimaryButton';
+export { MutationIndicator } from './MutationIndicator';

@@ -16,6 +16,7 @@ import {
   ChangePasswordSheet,
   ProfileEditorSheet,
 } from '@/components/profile';
+import { MutationIndicator } from '@/components/ui';
 import { TabBar } from '@/components/navigation/TabBar';
 import { ExpenseWizard } from '@/components/wizard';
 import { ActivityFeedScreen } from '@/screens/ActivityFeedScreen';
@@ -83,6 +84,7 @@ const Shell: React.FC = () => {
       <ManageHouseholdModal />
       <ProfileEditorSheet />
       <ChangePasswordSheet />
+      <MutationIndicator />
     </View>
   );
 };
