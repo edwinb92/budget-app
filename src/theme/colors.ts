@@ -18,6 +18,18 @@ export const palette = {
   rose: '#EF5DA8',
   roseSoft: '#FCE3F0',
 
+  orange: '#F97316',
+  orangeSoft: '#FFEDD5',
+
+  fuchsia: '#D946EF',
+  fuchsiaSoft: '#FAE8FF',
+
+  lime: '#84CC16',
+  limeSoft: '#ECFCCB',
+
+  stone: '#78716C',
+  stoneSoft: '#E7E5E4',
+
   slate: '#1F2230',
   slateMuted: '#6B7080',
   slateFaint: '#A1A6B5',
@@ -58,11 +70,15 @@ export const colors = {
 
   accents: {
     violet: { base: palette.violet, soft: palette.violetSoft },
-    coral: { base: palette.coral, soft: palette.coralSoft },
-    amber: { base: palette.amber, soft: palette.amberSoft },
-    mint: { base: palette.mint, soft: palette.mintSoft },
     sky: { base: palette.sky, soft: palette.skySoft },
+    mint: { base: palette.mint, soft: palette.mintSoft },
+    lime: { base: palette.lime, soft: palette.limeSoft },
+    amber: { base: palette.amber, soft: palette.amberSoft },
+    orange: { base: palette.orange, soft: palette.orangeSoft },
+    coral: { base: palette.coral, soft: palette.coralSoft },
     rose: { base: palette.rose, soft: palette.roseSoft },
+    fuchsia: { base: palette.fuchsia, soft: palette.fuchsiaSoft },
+    stone: { base: palette.stone, soft: palette.stoneSoft },
   },
 } as const;
 

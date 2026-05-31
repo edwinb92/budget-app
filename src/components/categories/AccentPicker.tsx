@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Check } from 'lucide-react-native';
 
 import { AccentName, colors, radius, spacing } from '@/theme';
@@ -9,11 +9,16 @@ interface AccentPickerProps {
   onChange: (accent: AccentName) => void;
 }
 
-const ACCENT_KEYS: AccentName[] = ['violet', 'coral', 'amber', 'mint', 'sky', 'rose'];
+// Derivado del theme: si agregás un accent en colors.accents aparece acá.
+const ACCENT_KEYS = Object.keys(colors.accents) as AccentName[];
 
 export const AccentPicker: React.FC<AccentPickerProps> = ({ value, onChange }) => {
   return (
-    <View style={styles.row}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.row}
+    >
       {ACCENT_KEYS.map((key) => {
         const accent = colors.accents[key];
         const selected = key === value;
@@ -35,7 +40,7 @@ export const AccentPicker: React.FC<AccentPickerProps> = ({ value, onChange }) =
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -43,6 +48,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: spacing.md,
+    paddingRight: spacing.lg,
   },
   swatch: {
     width: 36,
