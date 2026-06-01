@@ -52,9 +52,30 @@ export const DashboardScreen: React.FC = () => {
   const hasBudget = households.length > 0;
   const hasCategories = categories.length > 0;
 
+  const firstName = currentUser?.name.trim().split(/\s+/)[0] ?? '';
+  const greeting = firstName
+    ? t('dashboard.greeting', { name: firstName })
+    : t('dashboard.greetingFallback');
+  const monthLabel =
+    summary.monthLabel ||
+    new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const headerBlock = (
+    <View style={styles.header}>
+      <View>
+        <Text style={styles.greeting}>{greeting}</Text>
+        <Text style={styles.subgreeting}>{monthLabel}</Text>
+      </View>
+      <View style={styles.bell}>
+        <Bell size={20} color={colors.text.primary} strokeWidth={2.2} />
+      </View>
+    </View>
+  );
+
   if (!hasBudget) {
     return (
       <ScreenContainer>
+        {headerBlock}
         <View style={styles.fullEmpty}>
           <View style={styles.emptyIconWrap}>
             <Wallet size={32} color={colors.primary} strokeWidth={2.2} />
@@ -83,6 +104,7 @@ export const DashboardScreen: React.FC = () => {
   if (!hasCategories) {
     return (
       <ScreenContainer>
+        {headerBlock}
         <HouseholdSelector />
         <View style={styles.fullEmpty}>
           <View style={styles.emptyIconWrap}>
@@ -110,11 +132,6 @@ export const DashboardScreen: React.FC = () => {
     );
   }
 
-  const firstName = currentUser?.name.trim().split(/\s+/)[0] ?? '';
-  const greeting = firstName
-    ? t('dashboard.greeting', { name: firstName })
-    : t('dashboard.greetingFallback');
-
   const handleCategoryPress = (category: BudgetCategory) => {
     setCategoryFilter(category.id);
     setActiveTab('activity');
@@ -122,15 +139,7 @@ export const DashboardScreen: React.FC = () => {
 
   return (
     <ScreenContainer>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.subgreeting}>{summary.monthLabel}</Text>
-          </View>
-          <View style={styles.bell}>
-            <Bell size={20} color={colors.text.primary} strokeWidth={2.2} />
-          </View>
-        </View>
+        {headerBlock}
 
         <HouseholdSelector />
 
