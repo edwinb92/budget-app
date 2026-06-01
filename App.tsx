@@ -58,9 +58,13 @@ const FloatingFab: React.FC = () => {
   const insets = useSafeAreaInsets();
   const openWizard = useWizardStore((s) => s.open);
   const activeTab = useNavStore((s) => s.activeTab);
+  const hasBudget = useHouseholdStore((s) => s.households.length > 0);
+  const hasCategories = useBudgetStore((s) => s.categories.length > 0);
   const bottomOffset = TAB_BAR_HEIGHT + Math.max(insets.bottom, spacing.sm) + spacing.md;
 
   if (!FAB_TABS.has(activeTab)) return null;
+  // Sin presupuesto o sin categorías no podemos crear un gasto: ocultamos el FAB.
+  if (!hasBudget || !hasCategories) return null;
 
   return (
     <View
