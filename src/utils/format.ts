@@ -6,7 +6,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 export const getCurrencySymbol = (currency: string): string =>
   CURRENCY_SYMBOLS[currency] ?? currency;
 
-export const formatCurrency = (value: number, currency = 'USD'): string => {
+export const formatCurrency = (value: number, currency = 'CRC'): string => {
   const symbol = getCurrencySymbol(currency);
   const num = Math.round(value).toLocaleString('en-US');
   return `${symbol}${num}`;

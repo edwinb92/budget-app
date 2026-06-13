@@ -28,12 +28,12 @@ export const CreateHouseholdModal: React.FC = () => {
   const createHousehold = useHouseholdStore((s) => s.createHousehold);
 
   const [name, setName] = useState('');
-  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+  const [currency, setCurrency] = useState<CurrencyCode>('CRC');
 
   useEffect(() => {
     if (!isOpen) {
       setName('');
-      setCurrency('USD');
+      setCurrency('CRC');
     }
   }, [isOpen]);
 

@@ -6,10 +6,10 @@ import {
 } from '@/store/householdStore';
 import { formatCurrency, getCurrencySymbol } from '@/utils/format';
 
-// Devuelve el código de moneda del household activo (default 'USD').
+// Devuelve el código de moneda del household activo (default 'CRC').
 export const useActiveCurrency = (): string => {
   const household = useHouseholdStore(selectActiveHousehold);
-  return household?.currency ?? 'USD';
+  return household?.currency ?? 'CRC';
 };
 
 // Devuelve el símbolo ($ / ₡) del household activo.
