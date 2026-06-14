@@ -28,7 +28,14 @@ interface HouseholdState {
   deleteHousehold: (id: string) => Promise<void>;
   addMembership: (input: { householdId: string; userId: string; role: Membership['role'] }) => Promise<void>;
   updateUser: (userId: string, patch: Partial<Pick<User, 'name' | 'email' | 'accent'>>) => Promise<void>;
+  inviteMember: (householdId: string, email: string) => Promise<InviteOutcome>;
 }
+
+export type InviteOutcome =
+  | 'added'
+  | 'not_registered'
+  | 'already_member'
+  | 'error';
 
 const mapProfile = (p: {
   id: string;
@@ -170,6 +177,21 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
       if (patch.accent !== undefined) update.accent = patch.accent;
       await supabase.from('profiles').update(update).eq('id', userId);
       await get().fetchAll();
+    }),
+
+  inviteMember: async (householdId, email) =>
+    withMutation(async () => {
+      const { data, error } = await supabase.rpc('invite_member', {
+        p_household_id: householdId,
+        p_email: email,
+      });
+      if (error) {
+        console.warn('inviteMember failed:', error.message);
+        return 'error';
+      }
+      await get().fetchAll();
+      const outcome = (data ?? 'error') as InviteOutcome;
+      return outcome;
     }),
 }));
 

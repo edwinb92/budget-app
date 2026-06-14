@@ -27,6 +27,7 @@ import { DashboardScreen } from '@/screens/DashboardScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { initI18n } from '@/i18n';
 import { subscribeToHousehold } from '@/lib/realtime';
+import { useActivityFilterStore } from '@/store/activityFilterStore';
 import { initAuth, useAuthStore } from '@/store/authStore';
 import { useBudgetStore } from '@/store/budgetStore';
 import { useHouseholdStore } from '@/store/householdStore';
@@ -58,6 +59,7 @@ const FloatingFab: React.FC = () => {
   const insets = useSafeAreaInsets();
   const openWizard = useWizardStore((s) => s.open);
   const activeTab = useNavStore((s) => s.activeTab);
+  const filterCategoryId = useActivityFilterStore((s) => s.categoryId);
   const hasBudget = useHouseholdStore((s) => s.households.length > 0);
   const hasCategories = useBudgetStore((s) => s.categories.length > 0);
   const bottomOffset = TAB_BAR_HEIGHT + Math.max(insets.bottom, spacing.sm) + spacing.md;
@@ -66,12 +68,22 @@ const FloatingFab: React.FC = () => {
   // Sin presupuesto o sin categorías no podemos crear un gasto: ocultamos el FAB.
   if (!hasBudget || !hasCategories) return null;
 
+  // Si estoy en Activity con un filtro de categoría, precargamos esa categoría
+  // y arrancamos el wizard en el paso del monto.
+  const handlePress = () => {
+    if (activeTab === 'activity' && filterCategoryId) {
+      openWizard({ categoryId: filterCategoryId });
+    } else {
+      openWizard();
+    }
+  };
+
   return (
     <View
       pointerEvents="box-none"
       style={[styles.fabLayer, { bottom: bottomOffset }]}
     >
-      <QuickAddButton onPress={openWizard} />
+      <QuickAddButton onPress={handlePress} />
     </View>
   );
 };

@@ -287,6 +287,7 @@ export const ManageHouseholdModal: React.FC = () => {
 
       <InviteMemberSheet
         visible={inviteOpen}
+        householdId={household.id}
         householdName={household.name}
         onClose={() => setInviteOpen(false)}
       />

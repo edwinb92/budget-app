@@ -154,12 +154,14 @@
   },
   "invite": {
     "title": "Invite to budget",
-    "subtitle": "We'll email them a link to join this budget.",
+    "subtitle": "They need to have an account in the app to be added.",
     "emailLabel": "Email address",
     "emailPlaceholder": "name@example.com",
     "sendButton": "Send invitation",
-    "sentTitle": "Invitation sent",
-    "sentBody": "We sent an invite to {{email}}. They'll appear here once they accept."
+    "outcomeAdded": "Added {{email}} to this budget.",
+    "outcomeNotRegistered": "{{email}} isn't registered yet. Ask them to sign up first and try again.",
+    "outcomeAlreadyMember": "{{email}} is already a member of this budget.",
+    "outcomeError": "Something went wrong. Please try again."
   },
   "settings": {
     "title": "Settings",

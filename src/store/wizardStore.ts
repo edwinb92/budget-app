@@ -13,12 +13,16 @@ const emptyDraft: DraftExpense = {
   paidById: null,
 };
 
+interface OpenOptions {
+  categoryId?: string;
+}
+
 interface WizardState {
   isOpen: boolean;
   stepIndex: number;
   draft: DraftExpense;
 
-  open: () => void;
+  open: (options?: OpenOptions) => void;
   close: () => void;
   next: () => void;
   back: () => void;
@@ -34,8 +38,16 @@ export const useWizardStore = create<WizardState>((set, get) => ({
   stepIndex: 0,
   draft: { ...emptyDraft },
 
-  open: () =>
-    set({ isOpen: true, stepIndex: 0, draft: { ...emptyDraft } }),
+  // Si se abre con un categoryId precargado, saltamos al paso 1 (amount).
+  open: (options) =>
+    set({
+      isOpen: true,
+      stepIndex: options?.categoryId ? 1 : 0,
+      draft: {
+        ...emptyDraft,
+        categoryId: options?.categoryId ?? null,
+      },
+    }),
 
   close: () =>
     set({ isOpen: false, stepIndex: 0, draft: { ...emptyDraft } }),

@@ -77,14 +77,20 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
         .order('due_day', { ascending: true }),
     ]);
 
-    const categories: BudgetCategory[] = (catsRes.data ?? []).map((c: any) => ({
-      id: c.id,
-      name: c.name,
-      iconKey: c.iconKey,
-      accent: c.accent,
-      budgeted: Number(c.budgeted),
-      spent: Number(c.spent),
-    }));
+    // Ordenadas alfabéticamente, sensible al locale (acentos, mayúsculas).
+    const categoryCollator = new Intl.Collator(undefined, { sensitivity: 'base' });
+    const categories: BudgetCategory[] = (catsRes.data ?? [])
+      .map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        iconKey: c.iconKey,
+        accent: c.accent,
+        budgeted: Number(c.budgeted),
+        spent: Number(c.spent),
+      }))
+      .sort((a: BudgetCategory, b: BudgetCategory) =>
+        categoryCollator.compare(a.name, b.name),
+      );
 
     const expenses: Expense[] = (expensesRes.data ?? []).map((e: any) => ({
       id: e.id,

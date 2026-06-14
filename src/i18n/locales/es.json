@@ -154,12 +154,14 @@
   },
   "invite": {
     "title": "Invitar al presupuesto",
-    "subtitle": "Le mandamos un email con un link para unirse.",
+    "subtitle": "Tiene que tener cuenta en la app para poder agregarla.",
     "emailLabel": "Email",
     "emailPlaceholder": "nombre@ejemplo.com",
     "sendButton": "Enviar invitación",
-    "sentTitle": "Invitación enviada",
-    "sentBody": "Le mandamos una invitación a {{email}}. Va a aparecer acá cuando la acepte."
+    "outcomeAdded": "Se agregó {{email}} a este presupuesto.",
+    "outcomeNotRegistered": "{{email}} todavía no tiene cuenta. Pedile que se registre y volvé a intentar.",
+    "outcomeAlreadyMember": "{{email}} ya es miembro de este presupuesto.",
+    "outcomeError": "Algo salió mal. Volvé a intentar."
   },
   "settings": {
     "title": "Ajustes",

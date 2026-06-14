@@ -14,10 +14,12 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mail, X } from 'lucide-react-native';
 
+import { useHouseholdStore } from '@/store/householdStore';
 import { colors, radius, spacing, typography } from '@/theme';
 
 interface InviteMemberSheetProps {
   visible: boolean;
+  householdId: string;
   householdName: string;
   onClose: () => void;
 }
@@ -26,28 +28,42 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
   visible,
+  householdId,
   householdName,
   onClose,
 }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const inviteMember = useHouseholdStore((s) => s.inviteMember);
   const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (visible) setEmail('');
+    if (visible) {
+      setEmail('');
+      setSubmitting(false);
+    }
   }, [visible]);
 
   const trimmed = email.trim();
   const isValid = EMAIL_RE.test(trimmed);
 
-  const handleSend = () => {
-    if (!isValid) return;
+  const handleSend = async () => {
+    if (!isValid || submitting) return;
+    setSubmitting(true);
     const target = trimmed;
+    const outcome = await inviteMember(householdId, target);
+    setSubmitting(false);
     onClose();
-    Alert.alert(
-      t('invite.sentTitle'),
-      t('invite.sentBody', { email: target }),
-    );
+
+    const messageKey = {
+      added: 'invite.outcomeAdded',
+      not_registered: 'invite.outcomeNotRegistered',
+      already_member: 'invite.outcomeAlreadyMember',
+      error: 'invite.outcomeError',
+    }[outcome];
+
+    Alert.alert(t('invite.title'), t(messageKey, { email: target }));
   };
 
   return (
@@ -114,14 +130,16 @@ export const InviteMemberSheet: React.FC<InviteMemberSheetProps> = ({
 
             <Pressable
               onPress={handleSend}
-              disabled={!isValid}
+              disabled={!isValid || submitting}
               style={({ pressed }) => [
                 styles.sendBtn,
-                !isValid && styles.sendBtnDisabled,
-                pressed && isValid && styles.pressed,
+                (!isValid || submitting) && styles.sendBtnDisabled,
+                pressed && isValid && !submitting && styles.pressed,
               ]}
             >
-              <Text style={styles.sendLabel}>{t('invite.sendButton')}</Text>
+              <Text style={styles.sendLabel}>
+                {submitting ? t('common.saving') : t('invite.sendButton')}
+              </Text>
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>
